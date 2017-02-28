@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 MPI.init do |universe|
   world = universe.world
@@ -27,7 +27,7 @@ MPI.init do |universe|
   # g intersection empty == empty Group
   raise "assertion error" unless (g & empty).size == 0
 
-  first_half = (0... g.size/2).to_a
+  first_half = (0...g.size/2).to_a
 
   # f and s are first and second half of g
   f = g.subgroup_including(first_half)

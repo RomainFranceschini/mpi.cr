@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 BUF_SIZE = 10 * 1024 * 1024
 

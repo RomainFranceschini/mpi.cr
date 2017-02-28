@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 if universe = MPI.init
   world = universe.world
@@ -22,10 +22,10 @@ if universe = MPI.init
   end
 
   odd_comm = if odd_group.rank
-    world.split_collective(odd_group)
-  else
-    world.split_collective(empty_group)
-  end
+               world.split_collective(odd_group)
+             else
+               world.split_collective(empty_group)
+             end
 
   if odd_group.rank
     raise "should not happen" if odd_comm.null?
@@ -35,7 +35,6 @@ if universe = MPI.init
   else
     raise "should not happen" if !odd_comm.null?
   end
-
 
   oddness_comm = world.split(color: MPI::Color.new(world.rank % 2))
   raise "should not happen" if oddness_comm.null?

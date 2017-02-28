@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 version, subversion = MPI.version
 puts "MPI-#{version}.#{subversion}"

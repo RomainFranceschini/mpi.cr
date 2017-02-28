@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 if universe = MPI.init
   comm = universe.world

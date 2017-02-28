@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 MPI.init do |universe|
   world = universe.world
@@ -23,7 +23,7 @@ MPI.init do |universe|
     puts slice
 
     # messages "1" and "2" may be interleaved, but all have to be contained
-    #within the first  2 * n slots of the buffer
+    # within the first  2 * n slots of the buffer
     raise "assertion error" unless slice[0, 2*n].select { |x| x == 1 }.size == n
     raise "assertion error" unless slice[0, 2*n].select { |x| x == 2 }.size == n
 

@@ -1,4 +1,4 @@
-@[Link(ldflags: "-L/Users/romain/Documents/Dev/crystal/crmpi/crmpi/lib -lcrmpi")]
+@[Link(ldflags: "-L/Users/romain/Documents/Dev/crystal/mpi.cr/crmpi/lib -lcrmpi")]
 lib LibCRMPI
   enum Vendor
     MPICH
@@ -6,7 +6,7 @@ lib LibCRMPI
     UNKNOWN
   end
 
-  fun get_vendor = crmpi_get_vendor() : Vendor
+  fun get_vendor = crmpi_get_vendor : Vendor
 end
 
 case LibCRMPI.get_vendor

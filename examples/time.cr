@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 MPI.init do |universe|
   world = universe.world
@@ -7,6 +7,6 @@ MPI.init do |universe|
   world.barrier
   tend = MPI.time
 
-  puts "barrier took: #{tend-tstart}secs."
+  puts "barrier took: #{tend - tstart}secs."
   puts "the clock has a resolution of #{MPI.time_resolution}secs."
 end

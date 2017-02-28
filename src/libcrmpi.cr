@@ -1,4 +1,4 @@
-@[Link(ldflags: "-L/Users/romain/Documents/Dev/crystal/crmpi/crmpi/lib -lcrmpi")]
+@[Link(ldflags: "-L/Users/romain/Documents/Dev/crystal/mpi.cr/crmpi/lib -lcrmpi")]
 lib LibCRMPI
   $kCRMPI_COMM_WORLD : LibMPI::Comm
   $kCRMPI_COMM_SELF : LibMPI::Comm

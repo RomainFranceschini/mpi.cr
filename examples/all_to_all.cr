@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 MPI.init do |universe|
   world = universe.world

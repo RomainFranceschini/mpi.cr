@@ -1,4 +1,4 @@
-require "../src/crmpi"
+require "../src/mpi"
 
 MPI.init do |universe|
   world = universe.world
@@ -11,14 +11,14 @@ MPI.init do |universe|
   if rank == master_rank
     sum = master_proc.master_reduce(rank, 0, MPI::Operation.sum)
     puts "rank sum: #{sum}"
-    raise "assertion error" unless sum == size * (size-1) / 2
+    raise "assertion error" unless sum == size * (size - 1) / 2
   else
     master_proc.reduce(rank, MPI::Operation.sum)
   end
 
   max = world.all_reduce(rank, MPI::Operation.max)
   puts "max rank: #{max}"
-  raise "assertion error" unless max == size-1
+  raise "assertion error" unless max == size - 1
 
   a = 0b0000111111110000u64
   b = 0b0011110000111100u64
@@ -34,6 +34,4 @@ MPI.init do |universe|
   e = MPI.reduce_local(a, b, MPI::Operation.bitwise_xor)
   puts "#{a} ^ #{b} = #{e}"
   raise "assertion error" unless e == 0b0011001111001100u64
-
-
 end
