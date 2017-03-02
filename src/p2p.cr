@@ -163,7 +163,7 @@ module MPI
       res = Pointer(T).malloc
       status = self.matched_receive(res, 1)
       if status.count(x.to_mpi_datatype) == 0
-        raise "#{self} received an empty message"
+        raise "received an empty message"
       end
       {res.value, status}
     end
@@ -212,8 +212,8 @@ module MPI
         count
       end
 
-      if status.count(x.to_mpi_datatype) == 0
-        raise "#{self} received an empty message"
+      if status.count(T.to_mpi_datatype) == 0
+        raise "received an empty message"
       end
 
       {ary, status}
@@ -239,7 +239,7 @@ module MPI
       end
 
       if status.count(UInt8.to_mpi_datatype) == 0
-        raise "#{self} received an empty message"
+        raise "received an empty message"
       end
 
       {str, status}

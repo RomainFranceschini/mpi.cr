@@ -7,7 +7,7 @@ MPI.init do |universe|
   raise "assertion error" unless universe.buffer_size == BUF_SIZE
 
   universe.detach_buffer
-  universe.set_buffer_size = BUF_SIZE
+  universe.buffer_size = BUF_SIZE
 
   world = universe.world
 end
