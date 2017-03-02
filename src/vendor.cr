@@ -1,4 +1,4 @@
-@[Link(ldflags: "-L/Users/romain/Documents/Dev/crystal/mpi.cr/crmpi/lib -lcrmpi")]
+@[Link(ldflags: "#{__DIR__}/ext/libcrmpi.a -lmpi")]
 lib LibCRMPI
   enum Vendor
     MPICH
