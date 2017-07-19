@@ -9,7 +9,7 @@ link-flags ?= ## Additional flags to pass to the linker
 OS := $(shell uname -s | tr '[:upper:@]' '[:lower:]')
 
 O := build
-FLAGS := $(if $(release),--release )$(if $(stats),--stats )$(if $(threads),--threads $(threads) )$(if $(debug),-d )$(if $(no-debug),--no-debug )$(if $(link-flags),--link-flags$ $(link-flags) )
+FLAGS := $(if $(release),--release )$(if $(stats),--stats )$(if $(threads),--threads $(threads) )$(if $(debug),-d )$(if $(no-debug),--no-debug )$(if $(link-flags),--link-flags "$(link-flags)" )
 VERBOSE := $(if $(verbose),-v )
 
 SHELL = bash

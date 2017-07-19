@@ -26,8 +26,8 @@ install:
   - make
 
 script:
-  - crystal spec link-flags="-L ${MPI_PREFIX}/lib"
-  - make spec no-debug=1 link-flags="-L ${MPI_PREFIX}/lib"
+  - crystal spec link-flags="-L${MPI_PREFIX}/lib"
+  - make spec no-debug=1 link-flags="-L${MPI_PREFIX}/lib"
 
 cache:
   directories:
