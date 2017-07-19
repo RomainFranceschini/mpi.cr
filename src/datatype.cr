@@ -1,5 +1,4 @@
 module MPI
-
   # Describing an MPI datatype
   #
   # The core function of MPI is getting data from point A to point B (where A and B are e.g. single
@@ -113,7 +112,6 @@ module MPI
   # Standard section(s)
   #   - 4
   struct UserDatatype < Datatype
-
     # Frees this datatype
     def free
       MPI.err? LibMPI.type_free(self)
@@ -128,10 +126,15 @@ module MPI
     #
     # Standard section(s)
     #   - 4.1.2
-    def contiguous(count : Count, oldtype : Datatype)
+    def self.contiguous(count : Count, oldtype : Datatype) : self
       MPI.err? LibMPI.type_contiguous(count, oldtype, out newtype)
-      LibMPI.type_commit(newtype)
-      newtype
+      LibMPI.type_commit(pointerof(newtype))
+      self.new(newtype)
+    end
+
+    # ditto
+    def self.contiguous(count : Count, oldtype : ToDatatype) : self
+      self.contiguous(count, oldtype.to_mpi_datatype)
     end
 
     # Construct a new datatype out of *count* blocks of *blocklength* elements
@@ -143,10 +146,15 @@ module MPI
     #
     # Standard section(s)
     #   - 4.1.2
-    def vector(count : Count, blocklength : Count, stride : Count, oldtype : Datatype)
+    def self.vector(count : Count, blocklength : Count, stride : Count, oldtype : Datatype) : self
       MPI.err? LibMPI.type_vector(count, blocklength, stride, oldtype, out newtype)
-      LibMPI.type_commit(newtype)
-      newtype
+      LibMPI.type_commit(pointerof(newtype))
+      self.new(newtype)
+    end
+
+    # ditto
+    def self.vector(count : Count, blocklength : Count, stride : Count, oldtype : ToDatatype) : self
+      self.vector(count, blocklength, stride, oldtype.to_mpi_datatype)
     end
   end
 end
