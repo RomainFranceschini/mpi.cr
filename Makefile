@@ -2,12 +2,13 @@ release ?= ## Compile in release mode
 stats ?=   ## Enable statistics output
 threads ?= ## Maximum number of threads to use
 debug ?=   ## Add symbolic debug info
+no-debug ?= ## No symbolic debug info
 verbose ?= ## Run specs in verbose mode
 
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
 O := build
-FLAGS := $(if $(release),--release )$(if $(stats),--stats )$(if $(threads),--threads $(threads) )$(if $(debug),-d )
+FLAGS := $(if $(release),--release )$(if $(stats),--stats )$(if $(threads),--threads $(threads) )$(if $(debug),-d )$(if $(no-debug),--no-debug )
 VERBOSE := $(if $(verbose),-v )
 SHELL = bash
 
@@ -58,6 +59,10 @@ doc: deps ## Generate mpi.cr library documentation
 
 .PHONY: examples
 examples: $(DEPS) $(EXAMPLES_TARGETS)
+
+.PHONY: spec ## Run specs
+spec: examples
+	sh ci/run-examples.sh
 
 $(EXAMPLES_TARGETS) :
 	@mkdir -p $(O)

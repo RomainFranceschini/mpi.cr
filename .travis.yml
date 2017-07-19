@@ -1,0 +1,19 @@
+language: crystal
+
+matrix:
+  include:
+    - env: MPI_LIBRARY=mpich MPI_LIBRARY_VERSION=3.2
+    - env: MPI_LIBRARY=mpich MPI_LIBRARY_VERSION=3.1.4
+    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=2.1.1
+    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=2.0.3
+    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=1.10.7
+
+install:
+  - sh ci/install-mpi.sh
+  - export MPI_PREFIX="${HOME}/opt/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}"
+  - export PATH="${HOME}/.local/bin:${MPI_PREFIX}/bin${PATH:+":${PATH}"}"
+  - export LD_LIBRARY_PATH="${MPI_PREFIX}/lib${LD_LIBRARY_PATH:+":${LD_LIBRARY_PATH}"}"
+
+script:
+  - crystal spec
+  - make spec no-debug=1
