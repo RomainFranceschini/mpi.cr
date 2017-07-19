@@ -1,6 +1,6 @@
-{% if system("./src/ext/mpi_vendor").stringify == "mpich" %}
+{% if MPI::VENDOR == "mpich" %}
   require "./libmpi/mpich"
-{% elsif system("./src/ext/mpi_vendor").stringify == "openmpi" %}
+{% elsif MPI::VENDOR == "openmpi" %}
   require "./libmpi/openmpi"
 {% else %}
   {{ raise "Unknown MPI implementation. Use OpenMPI or MPICH." }}
@@ -8,6 +8,7 @@
 
 require "./libcrmpi"
 
+# :nodoc:
 @[Link("mpi")]
 lib LibMPI
   COMM_WORLD = LibCRMPI.kCRMPI_COMM_WORLD

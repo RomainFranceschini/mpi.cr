@@ -1,3 +1,4 @@
+# :nodoc:
 @[Link("mpi")]
 lib LibMPI
   ANY_SOURCE                 =        -1

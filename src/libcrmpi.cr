@@ -1,3 +1,4 @@
+# :nodoc:
 @[Link(ldflags: "#{__DIR__}/ext/libcrmpi.a -lmpi")]
 lib LibCRMPI
   $kCRMPI_COMM_WORLD : LibMPI::Comm
