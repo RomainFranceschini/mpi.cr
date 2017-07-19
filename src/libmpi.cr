@@ -1,58 +1,9 @@
-macro include_mpi_constants(mod)
-  @[Link("mpi")]
-  lib LibMPI
-  {% for cname in mod.resolve.constants %}
-    {{ cname.id }} = {{ mod.resolve.constant(cname) }}
-  {% end %}
-  end
-end
-
-{% if run("./vendor").stringify == "mpich" %}
-  include_mpi_constants(MPICH)
-
-  @[Link("mpi")]
-  lib LibMPI
-    type Comm = LibC::Int
-    type Group = LibC::Int
-    type Datatype = LibC::Int
-    type Request = LibC::Int
-    type Op = LibC::Int
-    type Info = LibC::Int
-    type Message = LibC::Int
-    type Win = LibC::Int
-    type ErrHandler = LibC::Int
-
-    struct Status
-      count_lo : LibC::Int
-      count_hi_and_cancelled : LibC::Int
-      source : LibC::Int
-      tag : LibC::Int
-      error : LibC::Int
-    end
-  end
-{% elsif run("./vendor").stringify == "open_mpi" %}
-  include_mpi_constants(OpenMPI)
-
-  @[Link("mpi")]
-  lib LibMPI
-    type Comm = Void*
-    type Group = Void*
-    type Datatype = Void*
-    type Request = Void*
-    type Op = Void*
-    type Info = Void*
-    type Message = Void*
-    type Win = Void*
-    type ErrHandler = Void*
-
-    struct Status
-      source : LibC::Int
-      tag : LibC::Int
-      error : LibC::Int
-      _cancelled : LibC::Int
-      _ucount : LibC::SizeT
-    end
-  end
+{% if system("./src/ext/mpi_vendor").stringify == "mpich" %}
+  require "./libmpi/mpich"
+{% elsif system("./src/ext/mpi_vendor").stringify == "openmpi" %}
+  require "./libmpi/openmpi"
+{% else %}
+  {{ raise "Unknown MPI implementation. Use OpenMPI or MPICH." }}
 {% end %}
 
 require "./libcrmpi"
@@ -60,40 +11,40 @@ require "./libcrmpi"
 @[Link("mpi")]
 lib LibMPI
   COMM_WORLD = LibCRMPI.kCRMPI_COMM_WORLD
-  COMM_SELF = LibCRMPI.kCRMPI_COMM_SELF
-  COMM_NULL = LibCRMPI.kCRMPI_COMM_NULL
+  COMM_SELF  = LibCRMPI.kCRMPI_COMM_SELF
+  COMM_NULL  = LibCRMPI.kCRMPI_COMM_NULL
 
   GROUP_EMPTY = LibCRMPI.kCRMPI_GROUP_EMPTY
-  GROUP_NULL = LibCRMPI.kCRMPI_GROUP_NULL
+  GROUP_NULL  = LibCRMPI.kCRMPI_GROUP_NULL
 
-  MESSAGE_NULL = LibCRMPI.kCRMPI_MESSAGE_NULL
+  MESSAGE_NULL    = LibCRMPI.kCRMPI_MESSAGE_NULL
   MESSAGE_NO_PROC = LibCRMPI.kCRMPI_MESSAGE_NO_PROC
 
   REQUEST_NULL = LibCRMPI.kCRMPI_REQUEST_NULL
 
   STATUS_IGNORE = LibCRMPI.kCRMPI_STATUS_IGNORE
 
-  OP_MAX = LibCRMPI.kCRMPI_MAX
-  OP_MIN = LibCRMPI.kCRMPI_MIN
-  OP_SUM = LibCRMPI.kCRMPI_SUM
+  OP_MAX  = LibCRMPI.kCRMPI_MAX
+  OP_MIN  = LibCRMPI.kCRMPI_MIN
+  OP_SUM  = LibCRMPI.kCRMPI_SUM
   OP_PROD = LibCRMPI.kCRMPI_PROD
   OP_LAND = LibCRMPI.kCRMPI_LAND
   OP_BAND = LibCRMPI.kCRMPI_BAND
-  OP_LOR = LibCRMPI.kCRMPI_LOR
-  OP_BOR = LibCRMPI.kCRMPI_BOR
+  OP_LOR  = LibCRMPI.kCRMPI_LOR
+  OP_BOR  = LibCRMPI.kCRMPI_BOR
   OP_LXOR = LibCRMPI.kCRMPI_LXOR
   OP_BXOR = LibCRMPI.kCRMPI_BXOR
 
-  FLOAT = LibCRMPI.kCRMPI_FLOAT
-  DOUBLE = LibCRMPI.kCRMPI_DOUBLE
-  INT_8_T = LibCRMPI.kCRMPI_INT8_T
-  INT_16_T = LibCRMPI.kCRMPI_INT16_T
-  INT_32_T = LibCRMPI.kCRMPI_INT32_T
-  INT_64_T = LibCRMPI.kCRMPI_INT64_T
-  UINT_8_T = LibCRMPI.kCRMPI_UINT8_T
-  UINT_16_T = LibCRMPI.kCRMPI_UINT16_T
-  UINT_32_T = LibCRMPI.kCRMPI_UINT32_T
-  UINT_64_T = LibCRMPI.kCRMPI_UINT64_T
+  FLOAT         = LibCRMPI.kCRMPI_FLOAT
+  DOUBLE        = LibCRMPI.kCRMPI_DOUBLE
+  INT_8_T       = LibCRMPI.kCRMPI_INT8_T
+  INT_16_T      = LibCRMPI.kCRMPI_INT16_T
+  INT_32_T      = LibCRMPI.kCRMPI_INT32_T
+  INT_64_T      = LibCRMPI.kCRMPI_INT64_T
+  UINT_8_T      = LibCRMPI.kCRMPI_UINT8_T
+  UINT_16_T     = LibCRMPI.kCRMPI_UINT16_T
+  UINT_32_T     = LibCRMPI.kCRMPI_UINT32_T
+  UINT_64_T     = LibCRMPI.kCRMPI_UINT64_T
   DATATYPE_NULL = LibCRMPI.kCRMPI_DATATYPE_NULL
 
   alias Count = LibC::LongLong

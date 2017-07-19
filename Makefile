@@ -22,7 +22,11 @@ LIB_CRMPI = src/ext/crmpi.c
 LIB_CRMPI_OBJ = $(subst .c,.o,$(LIB_CRMPI))
 LIB_CRMPI_TARGET = src/ext/libcrmpi.a
 
-DEPS = $(LIB_CRMPI_TARGET)
+BIN_CRMPI = src/ext/mpi_vendor.c
+BIN_CRMPI_OBJ = $(BIN_CRMPI:.c=.o)
+BIN_CRMPI_TARGET = src/ext/mpi_vendor
+
+DEPS = $(LIB_CRMPI_TARGET) $(BIN_CRMPI_TARGET)
 
 EXAMPLES_SOURCES := $(shell find examples -name '*.cr')
 EXAMPLES_TARGETS := $(patsubst %.cr, %, $(EXAMPLES_SOURCES))
@@ -30,7 +34,7 @@ EXAMPLES_TARGETS := $(patsubst %.cr, %, $(EXAMPLES_SOURCES))
 .PHONY: all
 all: deps
 
-.PHONY: deps libcrmpi
+.PHONY: deps libcrmpi mpivendor
 
 deps: $(DEPS) ## Build dependencies
 
@@ -38,6 +42,14 @@ libcrmpi: $(LIB_CRMPI_TARGET)
 
 $(LIB_CRMPI_TARGET): $(LIB_CRMPI_OBJ)
 	$(AR) -rcs $@ $^
+
+mpivendor: $(BIN_CRMPI_TARGET)
+
+$(BIN_CRMPI_OBJ): $(BIN_CRMPI)
+	$(CC) -o $@ -c $< $(CFLAGS)
+
+$(BIN_CRMPI_TARGET): $(BIN_CRMPI_OBJ)
+	$(CC) -o $@ $^
 
 .PHONY: doc
 doc: deps ## Generate mpi.cr library documentation
@@ -57,4 +69,4 @@ clean: ## Clean up built directories and files
 	rm -rf $(O)
 	rm -rf ./doc
 	rm -rf $(LIB_CRMPI_OBJ) $(LIB_CRMPI_TARGET)
-	rm -rf ~/.cache/crystal/* ## Since 0.21.0, macros `run` are reused unless code changes. Clear the cache
+	rm -rf $(BIN_CRMPI_OBJ) $(BIN_CRMPI_TARGET)

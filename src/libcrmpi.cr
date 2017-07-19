@@ -1,13 +1,5 @@
 @[Link(ldflags: "#{__DIR__}/ext/libcrmpi.a -lmpi")]
 lib LibCRMPI
-  enum Vendor
-    MPICH
-    OPEN_MPI
-    UNKNOWN
-  end
-
-  fun get_vendor = crmpi_get_vendor : Vendor
-
   $kCRMPI_COMM_WORLD : LibMPI::Comm
   $kCRMPI_COMM_SELF : LibMPI::Comm
   $kCRMPI_COMM_NULL : LibMPI::Comm

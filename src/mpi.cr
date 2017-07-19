@@ -1,5 +1,3 @@
-require "./openmpi"
-require "./mpich"
 require "./libmpi"
 
 require "./errors"
