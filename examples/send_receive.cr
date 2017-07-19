@@ -1,6 +1,6 @@
 require "../spec/spec_helper"
 
-if universe = MPI.init
+MPI.init do |universe|
   world = universe.world
   size = world.size
 
@@ -19,14 +19,16 @@ if universe = MPI.init
   assert msg == next_rank
 
   if rank > 0
-    msg2 = [rank, rank + 1, rank - 1]
-    world.process_at(0).send(msg)
+    world.process_at(0).send([rank, rank + 1, rank - 1])
   else
-    (1...size).each do
-      msg2, status = world.any_process.receive_array(Int32)
-      puts "Process #{rank} got message '#{msg2}'. Status is: #{status}"
+    (size-1).times do
+      ary, status = world.any_process.receive_array(Int32)
+      puts "Process #{rank} got message '#{ary}'. Status is: #{status}"
+
       x = status.source_rank
-      assert({x, x + 1, x - 1}.equals?(msg2) { |x, y| x == y })
+      ary2 = [x, x+1, x-1]
+
+      assert ary == ary2
     end
   end
 
@@ -36,5 +38,3 @@ if universe = MPI.init
   MPI.send_receive_replace(pointerof(x), 1, next_proc, prev_proc)
   assert x == prev_rank
 end
-
-MPI.finalize

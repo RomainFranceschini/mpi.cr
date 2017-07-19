@@ -1,15 +1,16 @@
 require "../spec/spec_helper"
 
-if universe = MPI.init
+MPI.init do |universe|
   world = universe.world
 
   odd = (0...world.size).select { |x| x % 2 != 0 }
   odd_group = world.group.subgroup_including(odd)
   even_group = world.group - odd_group
 
-  if !(world.rank % 2 == 0 && even_group.rank && odd_group.rank.nil? || even_group.rank.nil? && odd_group.rank)
-    assert false
-  end
+  assert(
+   (world.rank % 2 == 0 && even_group.rank != nil && odd_group.rank == nil) ||
+   (even_group.rank == nil && odd_group.rank != nil)
+  )
 
   my_group = odd_group.rank != nil ? odd_group : even_group
   empty_group = MPI::Group.empty
@@ -44,6 +45,4 @@ if universe = MPI.init
   else
     assert odd_comm.null?
   end
-
-  MPI.finalize
 end
