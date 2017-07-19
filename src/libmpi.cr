@@ -111,6 +111,8 @@ lib LibMPI
   fun error_string = MPI_Error_string(errorcode : ErrCode, string : LibC::Char*, resultlen : LibC::Int*) : ErrCode
   fun error_class = MPI_Error_class(errorcode : ErrCode, errorclass : LibC::Int*) : ErrCode
 
+  fun get_address = MPI_Get_address(location : Void*, address : Aint*) : LibC::Int
+
   # Communicators
 
   fun comm_rank = MPI_Comm_rank(comm : Comm, rank : LibC::Int*) : ErrCode

@@ -157,4 +157,17 @@ module MPI
       self.vector(count, blocklength, stride, oldtype.to_mpi_datatype)
     end
   end
+
+  # Returns the address of the argument in a format suitable for use with
+  # datatype constructors
+  #
+  # Examples
+  # See *examples/structured.cr*
+  #
+  # Standard section(s)
+  #   - 4.1.5
+  def self.address_of(x : T) : Address forall T
+    MPI.err? LibMPI.get_address(pointerof(x), out address)
+    address
+  end
 end
