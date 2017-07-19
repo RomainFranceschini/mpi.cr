@@ -1,5 +1,12 @@
 language: crystal
 
+addons:
+  apt:
+    packages:
+      # for building MPI libraries
+      - build-essential
+      - gfortran
+
 matrix:
   include:
     - env: MPI_LIBRARY=mpich MPI_LIBRARY_VERSION=3.2
@@ -17,3 +24,7 @@ install:
 script:
   - crystal spec
   - make spec no-debug=1
+
+cache:
+  directories:
+    - $HOME/opt
