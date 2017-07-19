@@ -1,4 +1,4 @@
-require "../src/mpi"
+require "../spec/spec_helper"
 
 MPI.init do |universe|
   world = universe.world

@@ -1,4 +1,4 @@
-require "../src/mpi"
+require "../spec/spec_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -13,7 +13,8 @@ MPI.init do |universe|
   end
 
   tmp = 0u64
-  raise "assertion error" unless slice.all? { |x| tmp += 1u64; x == 2u64**tmp }
+
+  assert slice.all? { |x| tmp += 1u64; x == 2u64**tmp }
 
   factor = world.rank.to_u64 + 1u64
   a = (1u64..count.to_u64).map { |x| x * factor }
@@ -25,4 +26,8 @@ MPI.init do |universe|
       puts chunk
     end
   end
+
+  assert (0u64..Float64::INFINITY).each.zip(slice.each).all? { |a, b|
+    b == (a / count + 1) * (a % count + 1)
+  }
 end

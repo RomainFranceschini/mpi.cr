@@ -1,4 +1,4 @@
-require "../src/mpi"
+require "../spec/spec_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -19,8 +19,8 @@ MPI.init do |universe|
 
     puts slice
 
-    raise "assertion error" unless slice[0, n].all? { |x| x == 1u64 }
-    raise "assertion error" unless slice[n, n].all? { |x| x == 2u64 }
+    assert slice[0, n].all? { |x| x == 1u64 }
+    assert slice[n, n].all? { |x| x == 2u64 }
   else
     world.process_at(0).send(1u64)
     world.barrier

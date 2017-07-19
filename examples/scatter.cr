@@ -1,4 +1,4 @@
-require "../src/mpi"
+require "../spec/spec_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -18,5 +18,5 @@ MPI.init do |universe|
   end
 
   puts "Process #{rank} received #{x}"
-  raise "assertion error" unless x == rank
+  assert x == rank
 end

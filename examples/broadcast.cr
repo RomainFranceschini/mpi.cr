@@ -1,4 +1,4 @@
-require "../src/mpi"
+require "../spec/spec_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -14,7 +14,7 @@ MPI.init do |universe|
 
   x = master_proc.broadcast(x)
   puts "Process #{world.rank} received value: #{x}"
-  raise "assertion error" unless x == 1024
+  assert x == 1024
 
   n = 4
   a = if world.rank == master_rank
@@ -25,5 +25,5 @@ MPI.init do |universe|
   master_proc.broadcast(a)
 
   puts "Process #{world.rank} received value: #{a}"
-  raise "assertion error" unless a == [2u64, 4u64, 8u64, 16u64]
+  assert a == [2u64, 4u64, 8u64, 16u64]
 end

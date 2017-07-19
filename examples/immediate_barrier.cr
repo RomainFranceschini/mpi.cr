@@ -1,4 +1,4 @@
-require "../src/mpi"
+require "../spec/spec_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -24,11 +24,11 @@ MPI.init do |universe|
 
     # messages "1" and "2" may be interleaved, but all have to be contained
     # within the first  2 * n slots of the buffer
-    raise "assertion error" unless slice[0, 2*n].select { |x| x == 1 }.size == n
-    raise "assertion error" unless slice[0, 2*n].select { |x| x == 2 }.size == n
+    assert slice[0, 2*n].select { |x| x == 1 }.size == n
+    assert slice[0, 2*n].select { |x| x == 2 }.size == n
 
     # the last n slots in the buffer may only contain message "3"
-    raise "assertion error" unless slice[2*n, n].all? { |x| x == 3 }
+    assert slice[2*n, n].all? { |x| x == 3 }
 
     # clean up barrier request
     breq.wait

@@ -1,4 +1,4 @@
-require "../src/mpi"
+require "../spec/spec_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -7,5 +7,5 @@ MPI.init do |universe|
   world.barrier
   moon.barrier
 
-  raise "assertion error" unless world.compare(moon) == MPI::ComparisonResult::Congruent
+  assert world.compare(moon) == MPI::ComparisonResult::Congruent
 end
