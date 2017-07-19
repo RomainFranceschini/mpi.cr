@@ -62,17 +62,17 @@ module MPI
     #
     # Examples
     # See *examples/simple.cr*
-    def self.world
+    def self.world : self
       Communicator.new(LibMPI::COMM_WORLD)
     end
 
     # Returns the *self* communicator.
-    def self.self
+    def self.self : self
       Communicator.new(LibMPI::COMM_SELF)
     end
 
     # Returns the *null* communicator.
-    def self.null
+    def self.null : self
       Communicator.new(LibMPI::COMM_NULL)
     end
 
@@ -313,12 +313,12 @@ module MPI
   #   - 6.2.1
   struct Group
     # Returns a null group.
-    def self.null
+    def self.null : self
       Group.new(LibMPI::GROUP_NULL)
     end
 
     # Returns an empty group.
-    def self.empty
+    def self.empty : self
       Group.new(LibMPI::GROUP_EMPTY)
     end
 

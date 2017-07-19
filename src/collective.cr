@@ -1,5 +1,4 @@
 module MPI
-
   # Applies a reduction operator to local arguments.
   #
   # Examples
@@ -558,7 +557,7 @@ module MPI
   # An operation to be used in a reduction or scan type operation.
   struct Operation
     macro builtin_op(op, mpiop)
-      def self.{{op.id}}
+      def self.{{op.id}} : self
         Operation.new({{mpiop}})
       end
 
