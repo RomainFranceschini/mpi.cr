@@ -4,12 +4,14 @@ threads ?= ## Maximum number of threads to use
 debug ?=   ## Add symbolic debug info
 no-debug ?= ## No symbolic debug info
 verbose ?= ## Run specs in verbose mode
+link-flags ?= ## Additional flags to pass to the linker
 
-OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+OS := $(shell uname -s | tr '[:upper:@]' '[:lower:]')
 
 O := build
-FLAGS := $(if $(release),--release )$(if $(stats),--stats )$(if $(threads),--threads $(threads) )$(if $(debug),-d )$(if $(no-debug),--no-debug )
+FLAGS := $(if $(release),--release )$(if $(stats),--stats )$(if $(threads),--threads $(threads) )$(if $(debug),-d )$(if $(no-debug),--no-debug )$(if $(link-flags),--link-flags$ $(link-flags) )
 VERBOSE := $(if $(verbose),-v )
+
 SHELL = bash
 
 ## Use mpicc wrapper rather than the system C compiler.

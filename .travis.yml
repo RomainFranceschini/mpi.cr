@@ -2,6 +2,9 @@ language: crystal
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.9
     packages:
       # for building MPI libraries
       - build-essential
@@ -23,8 +26,8 @@ install:
   - make
 
 script:
-  - crystal spec
-  - make spec no-debug=1
+  - crystal spec link-flags="-L ${MPI_PREFIX}/lib"
+  - make spec no-debug=1 link-flags="-L ${MPI_PREFIX}/lib"
 
 cache:
   directories:
