@@ -19,19 +19,31 @@ module MPI
 
   # A color used in a communicator split
   struct Color
+    @raw : Int32
+
     # Special color of undefined value
-    def self.undefined
+    def self.undefined : self
       Color.new(LibMPI::UNDEFINED)
+    end
+
+    # Initialize a color tainted by the given symbol.
+    def initialize(color : Symbol)
+      @raw = color.to_i
+    end
+
+    # Initialize a color of a certain value
+    def initialize(color : Int::Unsigned)
+      @raw = color.to_i32
     end
 
     # Initialize a color of a certain value
     #
     # Valid values are non-negative.
-    def initialize(raw : LibC::Int)
+    def initialize(raw : Int::Signed)
       if raw < 0 && raw != LibMPI::UNDEFINED
         raise ArgumentError.new("Value of color must be non-negative.")
       end
-      @raw = raw
+      @raw = raw.to_i32
     end
 
     def to_unsafe
