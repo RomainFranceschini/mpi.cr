@@ -64,6 +64,7 @@ examples: $(DEPS) $(EXAMPLES_TARGETS)
 
 .PHONY: spec ## Run specs
 spec: examples
+	$(BUILD_PATH) crystal spec $(FLAGS)
 	sh ci/run-examples.sh
 
 $(EXAMPLES_TARGETS) :
