@@ -199,15 +199,15 @@ lib LibMPI
   WinSize         =  8
   WtimeIsGlobal   =  3
 
-  type Comm = Void*
-  type Group = Void*
-  type Datatype = Void*
-  type Request = Void*
-  type Op = Void*
-  type Info = Void*
-  type Message = Void*
-  type Win = Void*
-  type ErrHandler = Void*
+  alias Comm = Void*
+  alias Group = Void*
+  alias Datatype = Void*
+  alias Request = Void*
+  alias Op = Void*
+  alias Info = Void*
+  alias Message = Void*
+  alias Win = Void*
+  alias ErrHandler = Void*
 
   struct Status
     source : LibC::Int

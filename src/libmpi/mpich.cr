@@ -136,15 +136,15 @@ lib LibMPI
   WIN_SIZE                = 1711276035
   WTIME_IS_GLOBAL         = 1681915911
 
-  type Comm = LibC::Int
-  type Group = LibC::Int
-  type Datatype = LibC::Int
-  type Request = LibC::Int
-  type Op = LibC::Int
-  type Info = LibC::Int
-  type Message = LibC::Int
-  type Win = LibC::Int
-  type ErrHandler = LibC::Int
+  alias Comm = LibC::Int
+  alias Group = LibC::Int
+  alias Datatype = LibC::Int
+  alias Request = LibC::Int
+  alias Op = LibC::Int
+  alias Info = LibC::Int
+  alias Message = LibC::Int
+  alias Win = LibC::Int
+  alias ErrHandler = LibC::Int
 
   struct Status
     count_lo : LibC::Int
