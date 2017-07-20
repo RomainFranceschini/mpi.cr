@@ -21,11 +21,12 @@ install:
   - sh ci/install-mpi.sh
   - export MPI_PREFIX="${HOME}/opt/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}"
   - export PATH="${HOME}/.local/bin:${MPI_PREFIX}/bin${PATH:+":${PATH}"}"
-  - export LD_LIBRARY_PATH="${MPI_PREFIX}/lib${LD_LIBRARY_PATH:+":${LD_LIBRARY_PATH}"}"
+  - export LD_LIBRARY_PATH=${MPI_PREFIX}/lib:${LD_LIBRARY_PATH}
+  - export LIBRARY_PATH=${MPI_PREFIX}/lib:${LIBRARY_PATH}
   - make
 
 script:
-  - make spec no-debug=1 link-flags="-L${MPI_PREFIX}/lib"
+  - make spec no-debug=1
 
 cache:
   directories:
