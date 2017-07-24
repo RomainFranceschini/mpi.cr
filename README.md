@@ -1,6 +1,6 @@
 # mpi.cr - MPI bindings for Crystal (WIP)
 
-[![Build Status](https://travis-ci.org/romain1189/mpi.cr.svg?branch=master)](https://travis-ci.org/romain1189/mpi.cr)
+[![Build Status](https://travis-ci.org/rumenzu/mpi.cr.svg?branch=master)](https://travis-ci.org/rumenzu/mpi.cr)
 
 The [Message Passing Interface](http://www.mpi-forum.org) (MPI) is a specification for a
 message-passing style concurrency library. Implementations of MPI are often used to structure parallel computation on High Performance Computing systems. The MPI specification describes bindings for the C programming language (and through it C++) as well as for the Fortran programming language. 
@@ -18,7 +18,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   mpi.cr:
-    github: romain1189/mpi.cr
+    github: rumenzu/mpi.cr
     version: 0.1.0
 ```
 
@@ -62,7 +62,7 @@ Hello, world from process 3 of 4!
 
 ## Contributors
 
-- [[romain1189]](https://github.com/[romain1189]) Romain Franceschini - creator, maintainer
+- [[rumenzu]](https://github.com/[rumenzu]) Romain Franceschini - creator, maintainer
 
 ## License
 
