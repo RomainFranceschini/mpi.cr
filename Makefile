@@ -32,7 +32,7 @@ BIN_CRMPI_TARGET = src/ext/mpi_vendor
 DEPS = $(LIB_CRMPI_TARGET) $(BIN_CRMPI_TARGET)
 
 EXAMPLES_SOURCES := $(shell find examples -name '*.cr')
-EXAMPLES_TARGETS := $(patsubst %.cr, %, $(EXAMPLES_SOURCES))
+EXAMPLES_TARGETS := $(subst examples, $(O), $(patsubst %.cr, %, $(EXAMPLES_SOURCES)))
 
 .PHONY: all
 all: deps
@@ -54,6 +54,10 @@ $(BIN_CRMPI_OBJ): $(BIN_CRMPI)
 $(BIN_CRMPI_TARGET): $(BIN_CRMPI_OBJ)
 	$(CC) -o $@ $^
 
+$(EXAMPLES_TARGETS):
+	@mkdir -p $(O)
+	$(BUILD_PATH) crystal build $(FLAGS) $(addsuffix .cr, $(subst build, examples, $@)) -o $@
+
 .PHONY: doc
 doc: deps ## Generate mpi.cr library documentation
 	@echo "Building documentation..."
@@ -66,10 +70,6 @@ examples: $(DEPS) $(EXAMPLES_TARGETS)
 spec: examples
 	$(BUILD_PATH) crystal spec $(FLAGS)
 	sh ci/run-examples.sh
-
-$(EXAMPLES_TARGETS) :
-	@mkdir -p $(O)
-	$(BUILD_PATH) crystal build $(FLAGS) $(addsuffix .cr,$@) -o $(subst examples,$(O),$@)
 
 .PHONY: clean
 clean: ## Clean up built directories and files
