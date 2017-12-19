@@ -26,8 +26,8 @@ dependencies:
 
 An implementation of the C language interface that conforms to MPI-3.1. `mpi.cr` currently support the following implementations:
 
-- [OpenMPI](https://www.open-mpi.org) 1.10.7, 2.0.3, 2.1.1
-- [MPICH](https://www.mpich.org) 3.2, 3.1.4
+- [OpenMPI](https://www.open-mpi.org) 2.0.4, 2.1.2, 3.0.0
+- [MPICH](https://www.mpich.org) 3.2.1, 3.1.4
 
 Since the MPI standard leaves some details of the C API unspecified (e.g. whether to implement certain constants and even functions using preprocessor macros or native C constructs, the details of most types, ...) `mpi.cr` uses a thin *static* library written in C (see `src/ext/crmpi.c`) that tries to capture the underspecified identifiers and re-exports them with a fixed C API to generate functional low-level bindings. 
 

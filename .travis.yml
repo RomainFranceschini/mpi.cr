@@ -11,11 +11,11 @@ addons:
 
 matrix:
   include:
-    - env: MPI_LIBRARY=mpich MPI_LIBRARY_VERSION=3.2
+    - env: MPI_LIBRARY=mpich MPI_LIBRARY_VERSION=3.2.1
     - env: MPI_LIBRARY=mpich MPI_LIBRARY_VERSION=3.1.4
-    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=2.1.1
-    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=2.0.3
-    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=1.10.7
+    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=3.0.0
+    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=2.1.2
+    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=2.0.4
 
 install:
   - sh ci/install-mpi.sh
