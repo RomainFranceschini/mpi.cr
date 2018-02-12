@@ -577,6 +577,36 @@ module MPI
     builtin_op logical_xor, LibMPI::OP_LXOR
     builtin_op bitwise_xor, LibMPI::OP_BXOR
 
+    # Max operation
+    MAX = self.max
+
+    # Min operation
+    MIN = self.min
+
+    # Sum operation
+    SUM = self.sum
+
+    # Product operation
+    PROD = self.product
+
+    # Logical AND operation
+    LAND = self.logical_and
+
+    # Bitwise AND operation
+    BAND = self.bitwise_and
+
+    # Logical OR operation
+    LOR = self.logical_or
+
+    # Bitwise OR operation
+    BOR = self.bitwise_or
+
+    # Logical XOR operation
+    LXOR = self.logical_xor
+
+    # Bitwise XOR operation
+    BXOR = self.bitwise_xor
+
     def initialize(@raw : LibMPI::Op)
     end
 
