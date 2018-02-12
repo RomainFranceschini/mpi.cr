@@ -1,5 +1,4 @@
 module MPI
-
   # Request objects for non-blocking operations
   #
   # Non-blocking operations such as `Process#immediate_send` return request
@@ -15,6 +14,7 @@ module MPI
   # - **3.8**:
   #   - Cancellation, MPI_Cancel(), MPI_Test_cancelled()
   struct Request
+    # Returns a null request.
     def self.null
       Request.new(LibMPI::REQUEST_NULL)
     end
@@ -57,26 +57,32 @@ module MPI
 
     # Tests for the completion of a request.
     #
-    # Returns *true* with the corresponding `Status` if the operations has
-    # finished, otherwise returns *false* with a *nil* status.
+    # Returns the corresponding `Status` if the operations has
+    # finished, otherwise returns *nil*.
     #
     # Examples
     # See *examples/immediate.cr*
     #
     # Standard section(s)
     #   - 3.7.3
-    def completed? : { Bool, Status? }
-      MPI.err? LibMPI.test(self, out flag, out status)
+    def status : Status?
+      MPI.err? LibMPI.test(pointerof(@raw), out flag, out status)
       if flag != 0 # complete
-        { true, Status.new(status) }
+        Status.new(status)
       else
-        { false, nil }
+        nil
       end
+    end
+
+    # Tests for the completion of a request.
+    #
+    # Returns *true* if the operations has finished, otherwise returns *false*.
+    def completed? : Bool
+      self.status != nil
     end
 
     def to_unsafe
       @raw
     end
   end
-
 end
