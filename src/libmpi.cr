@@ -159,11 +159,22 @@ lib LibMPI
   fun get_count = MPI_Get_count(status : Status*, datatype : Datatype, count : LibC::Int*) : ErrCode
   fun probe = MPI_Probe(source : LibC::Int, tag : LibC::Int, comm : Comm, status : Status*) : ErrCode
   fun mprobe = MPI_Mprobe(source : LibC::Int, tag : LibC::Int, comm : Comm, message : Message*, status : Status*) : ErrCode
+  fun iprobe = MPI_Iprobe(source : LibC::Int, tag : LibC::Int, comm : Comm, flag : LibC::Int*, status : Status*) : LibC::Int
+  fun improbe = MPI_Improbe(source : LibC::Int, tag : LibC::Int, comm : Comm, flag : LibC::Int*, message : Message*, status : Status*) : LibC::Int
   fun recv = MPI_Recv(buf : Void*, count : LibC::Int, datatype : Datatype, source : LibC::Int, tag : LibC::Int, comm : Comm, status : Status*) : ErrCode
   fun send = MPI_Send(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, tag : LibC::Int, comm : Comm) : ErrCode
   fun mrecv = MPI_Mrecv(buf : Void*, count : LibC::Int, datatype : Datatype, message : Message*, status : Status*) : ErrCode
   fun sendrecv = MPI_Sendrecv(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, dest : LibC::Int, sendtag : LibC::Int, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, source : LibC::Int, recvtag : LibC::Int, comm : Comm, status : Status*) : ErrCode
   fun sendrecv_replace = MPI_Sendrecv_replace(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, sendtag : LibC::Int, source : LibC::Int, recvtag : LibC::Int, comm : Comm, status : Status*) : ErrCode
+  fun bsend = MPI_Bsend(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, tag : LibC::Int, comm : Comm) : LibC::Int
+  fun ssend = MPI_Ssend(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, tag : LibC::Int, comm : Comm) : LibC::Int
+  fun rsend = MPI_Rsend(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, tag : LibC::Int, comm : Comm) : LibC::Int
+  fun isend = MPI_Isend(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, tag : LibC::Int, comm : Comm, request : Request*) : LibC::Int
+  fun ibsend = MPI_Ibsend(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, tag : LibC::Int, comm : Comm, request : Request*) : LibC::Int
+  fun issend = MPI_Issend(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, tag : LibC::Int, comm : Comm, request : Request*) : LibC::Int
+  fun irsend = MPI_Irsend(buf : Void*, count : LibC::Int, datatype : Datatype, dest : LibC::Int, tag : LibC::Int, comm : Comm, request : Request*) : LibC::Int
+  fun irecv = MPI_Irecv(buf : Void*, count : LibC::Int, datatype : Datatype, source : LibC::Int, tag : LibC::Int, comm : Comm, request : Request*) : LibC::Int
+  fun imrecv = MPI_Imrecv(buf : Void*, count : LibC::Int, datatype : Datatype, message : Message*, request : Request*) : LibC::Int
 
   # Collective communications
 

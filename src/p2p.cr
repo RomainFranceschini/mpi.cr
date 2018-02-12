@@ -244,6 +244,15 @@ module MPI
 
       {str, status}
     end
+
+    # Asynchronously receive a previously probed message into *buf*.
+    #
+    # Standard section(s)
+    #   - 3.8.3
+    def immediate_matched_receive(buf : Pointer(T), count : Count, tag : Tag = LibMPI::ANY_TAG) : Request forall T
+      MPI.err? LibMPI.imrecv(buf, count, T.to_mpi_datatype, pointerof(@raw), out request)
+      Request.new(request)
+    end
   end
 
   # Describes the result of a point to point receive operation.
@@ -409,6 +418,97 @@ module MPI
       msg, status = self.matched_probe(tag)
       msg.matched_receive_string(status)
     end
+
+    # Initiate an immediate (non-blocking) receive operation.
+    #
+    # Initiate receiving a message from `Source` self tagged *tag* containing
+    # *count* instances of type *T* into buffer *buf*.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_receive(buf : Pointer(T), count : Count, tag : Tag = LibMPI::ANY_TAG) : Request forall T
+      MPI.err? LibMPI.irecv(buf, count, T.to_mpi_datatype, self.source_rank,
+        tag, self.comm, out request)
+      Request.new(request)
+    end
+
+    # Receive a message containing multiple instances of type *T* into the
+    # given slice or static array.
+    #
+    # Initiate receiving a message from `Source` self tagged *tag* containing
+    # *collection.size* instances of type *T* into the given collection.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_receive(collection : Slice(Equivalence) | StaticArray(Equivalence, N), tag : Tag = LibMPI::ANY_TAG) : Request forall N
+      self.immediate_receive(collection.to_unsafe, collection.size, tag)
+    end
+
+    # Initiate an immediate (non-blocking) receive operation.
+    #
+    # Initiate receiving a message from `Source` self tagged *tag* containing a
+    # single instance of type *T*.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_receive(x : T.class, tag : Tag = LibMPI::ANY_TAG) : ReceiveFuture(T) forall T
+      res = Pointer(T).malloc
+      req = self.immediate_receive(res, 1, tag)
+      ReceiveFuture(T).new(res, req)
+    end
+
+    # Asynchronously probe a source for incoming messages.
+    #
+    # Asynchronously probe `self` for incoming messages with a given tag.
+    #
+    # Same as `#probe` but returns `nil` immediately if there is no incoming
+    # message to be probed.
+    #
+    # Standard section(s)
+    #   - 3.8.1
+    def immediate_probe(tag : Tag = LibMPI::ANY_TAG) : Status?
+      MPI.err? LibMPI.iprobe(self.source_rank, tag, self.comm, out flag, out status)
+      if flag != 0
+        Status.new(status)
+      else
+        nil
+      end
+    end
+
+    # Asynchronously probe a source for incoming messages with guaranteed
+    # reception.
+    #
+    # Asynchronously probe `self` for incoming messages with a given tag.
+    #
+    # Same as #matched_probe` but returns `nil` immediately if there is no
+    # incoming message to be probed.
+    #
+    # Standard section(s)
+    #   - 3.8.2
+    def immediate_matched_probe(tag : Tag = LibMPI::ANY_TAG) : Tuple(Message, Status)?
+      MPI.err? LibMPI.improbe(self.source_rank, tag, self.comm, out flag, out msg, out status)
+      if flag != 0
+        {Message.new(msg), Status.new(status)}
+      else
+        nil
+      end
+    end
+  end
+
+  # A `ReceiveFuture` represents a value of type `T` received via a
+  # non-blocking receive operation.
+  struct ReceiveFuture(T)
+    def initialize(@data : Pointer(T), @request : Request)
+    end
+
+    # Wait for the receive operation to finish and return the received data.
+    def get : {T, Status}
+      status = @request.wait
+      if status.count(T.to_mpi_datatype) == 0
+        raise "Received an empty message into #{self}."
+      end
+      {@data.value, status}
+    end
   end
 
   # Something that can be used as the destination in a point to point send
@@ -476,6 +576,307 @@ module MPI
     #   - 3.2.1
     def send(obj : Equivalence, tag : Tag = 0)
       self.send(pointerof(obj), 1, tag)
+    end
+
+    # Blocking buffered mode send operation.
+    #
+    # Send *count* elements of type *T* from given pointer *buf* to the
+    # `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.4
+    def buffered_send(buf : Pointer(T), count : Count, tag : Tag = 0) forall T
+      MPI.err? LibMPI.bsend(buf, count, T.to_mpi_datatype, self.destination_rank,
+        tag, self.comm)
+    end
+
+    # Blocking buffered mode send operation.
+    #
+    # Send contents of given collection of type *T* to the `Destination` self
+    # and tag it.
+    #
+    # Standard section(s)
+    #  - 3.4
+    def buffered_send(col : Slice(Equivalence) | Array(Equivalence) | StaticArray(Equivalence, N), tag : Tag = 0) forall N
+      self.buffered_send(col.to_unsafe, col.size, tag)
+    end
+
+    # Blocking buffered mode send operation.
+    #
+    # Send contents of given string to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #  - 3.4
+    def buffered_send(str : String, tag : Tag = 0)
+      self.buffered_send(str.to_unsafe, str.bytesize, tag)
+    end
+
+    # Blocking buffered mode send operation.
+    #
+    # Send the given *obj* to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.4
+    def buffered_send(obj : Equivalence, tag : Tag = 0)
+      self.buffered_send(pointerof(obj), 1, tag)
+    end
+
+    # Blocking synchronous mode send operation.
+    #
+    # Send *count* elements of type *T* from given pointer *buf* to the
+    # `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.4
+    def synchronous_send(buf : Pointer(T), count : Count, tag : Tag = 0) forall T
+      MPI.err? LibMPI.ssend(buf, count, T.to_mpi_datatype, self.destination_rank,
+        tag, self.comm)
+    end
+
+    # Blocking synchronous mode send operation.
+    #
+    # Send contents of given collection of type *T* to the `Destination` self
+    # and tag it.
+    #
+    # Standard section(s)
+    #  - 3.4
+    def synchronous_send(col : Slice(Equivalence) | Array(Equivalence) | StaticArray(Equivalence, N), tag : Tag = 0) forall N
+      self.synchronous_send(col.to_unsafe, col.size, tag)
+    end
+
+    # Blocking synchronous mode send operation.
+    #
+    # Send contents of given string to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #  - 3.4
+    def synchronous_send(str : String, tag : Tag = 0)
+      self.synchronous_send(str.to_unsafe, str.bytesize, tag)
+    end
+
+    # Blocking synchronous mode send operation.
+    #
+    # Send the given *obj* to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.4
+    def synchronous_send(obj : Equivalence, tag : Tag = 0)
+      self.synchronous_send(pointerof(obj), 1, tag)
+    end
+
+    # Blocking ready mode send operation.
+    #
+    # Send *count* elements of type *T* from given pointer *buf* to the
+    # `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.4
+    def ready_send(buf : Pointer(T), count : Count, tag : Tag = 0) forall T
+      MPI.err? LibMPI.rsend(buf, count, T.to_mpi_datatype, self.destination_rank,
+        tag, self.comm)
+    end
+
+    # Blocking ready mode send operation.
+    #
+    # Send contents of given collection of type *T* to the `Destination` self
+    # and tag it.
+    #
+    # Standard section(s)
+    #  - 3.4
+    def ready_send(col : Slice(Equivalence) | Array(Equivalence) | StaticArray(Equivalence, N), tag : Tag = 0) forall N
+      self.ready_send(col.to_unsafe, col.size, tag)
+    end
+
+    # Blocking ready mode send operation.
+    #
+    # Send contents of given string to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #  - 3.4
+    def ready_send(str : String, tag : Tag = 0)
+      self.ready_send(str.to_unsafe, str.bytesize, tag)
+    end
+
+    # Blocking ready mode send operation.
+    #
+    # Send the given *obj* to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.4
+    def ready_send(obj : Equivalence, tag : Tag = 0)
+      self.ready_send(pointerof(obj), 1, tag)
+    end
+
+    # Initiate an immediate (non-blocking) standard mode send operation.
+    #
+    # Send *count* elements of type *T* from given pointer *buf* to the
+    # `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_send(buf : Pointer(T), count : Count, tag : Tag = 0) : Request forall T
+      MPI.err? LibMPI.isend(buf, count, T.to_mpi_datatype, self.destination_rank, tag, self.comm, out request)
+      Request.new(request)
+    end
+
+    # Initiate an immediate (non-blocking) standard mode send operation.
+    #
+    # Send contents of given collection of type *T* to the `Destination` self
+    # and tag it.
+    #
+    # Standard section(s)
+    #  - 3.7.2
+    def immediate_send(col : Slice(Equivalence) | Array(Equivalence) | StaticArray(Equivalence, N), tag : Tag = 0) : Request forall N
+      self.immediate_send(col.to_unsafe, col.size, tag)
+    end
+
+    # Initiate an immediate (non-blocking) standard mode send operation.
+    #
+    # Send contents of given string to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #  - 3.7.2
+    def immediate_send(str : String, tag : Tag = 0) : Request
+      self.immediate_send(str.to_unsafe, str.bytesize, tag)
+    end
+
+    # Initiate an immediate (non-blocking) standard mode send operation.
+    #
+    # Send the given *obj* to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_send(obj : Equivalence, tag : Tag = 0) : Request
+      self.immediate_send(pointerof(obj), 1, tag)
+    end
+
+    # Initiate an immediate (non-blocking) buffered mode send operation.
+    #
+    # Send *count* elements of type *T* from given pointer *buf* to the
+    # `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_buffered_send(buf : Pointer(T), count : Count, tag : Tag = 0) : Request forall T
+      MPI.err? LibMPI.ibsend(buf, count, T.to_mpi_datatype, self.destination_rank, tag, self.comm, out request)
+      Request.new(request)
+    end
+
+    # Initiate an immediate (non-blocking) buffered mode send operation.
+    #
+    # Send contents of given collection of type *T* to the `Destination` self
+    # and tag it.
+    #
+    # Standard section(s)
+    #  - 3.7.2
+    def immediate_buffered_send(col : Slice(Equivalence) | Array(Equivalence) | StaticArray(Equivalence, N), tag : Tag = 0) : Request forall N
+      self.immediate_buffered_send(col.to_unsafe, col.size, tag)
+    end
+
+    # Initiate an immediate (non-blocking) buffered mode send operation.
+    #
+    # Send contents of given string to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #  - 3.7.2
+    def immediate_buffered_send(str : String, tag : Tag = 0) : Request
+      self.immediate_buffered_send(str.to_unsafe, str.bytesize, tag)
+    end
+
+    # Initiate an immediate (non-blocking) buffered mode send operation.
+    #
+    # Send the given *obj* to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_buffered_send(obj : Equivalence, tag : Tag = 0) : Request
+      self.immediate_buffered_send(pointerof(obj), 1, tag)
+    end
+
+    # Initiate an immediate (non-blocking) synchronous mode send operation.
+    #
+    # Send *count* elements of type *T* from given pointer *buf* to the
+    # `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_synchronous_send(buf : Pointer(T), count : Count, tag : Tag = 0) : Request forall T
+      MPI.err? LibMPI.issend(buf, count, T.to_mpi_datatype, self.destination_rank, tag, self.comm, out request)
+      Request.new(request)
+    end
+
+    # Initiate an immediate (non-blocking) synchronous mode send operation.
+    #
+    # Send contents of given collection of type *T* to the `Destination` self
+    # and tag it.
+    #
+    # Standard section(s)
+    #  - 3.7.2
+    def immediate_synchronous_send(col : Slice(Equivalence) | Array(Equivalence) | StaticArray(Equivalence, N), tag : Tag = 0) : Request forall N
+      self.immediate_synchronous_send(col.to_unsafe, col.size, tag)
+    end
+
+    # Initiate an immediate (non-blocking) synchronous mode send operation.
+    #
+    # Send contents of given string to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #  - 3.7.2
+    def immediate_synchronous_send(str : String, tag : Tag = 0) : Request
+      self.immediate_synchronous_send(str.to_unsafe, str.bytesize, tag)
+    end
+
+    # Initiate an immediate (non-blocking) synchronous mode send operation.
+    #
+    # Send the given *obj* to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_synchronous_send(obj : Equivalence, tag : Tag = 0) : Request
+      self.immediate_synchronous_send(pointerof(obj), 1, tag)
+    end
+
+    # Initiate an immediate (non-blocking) ready mode send operation.
+    #
+    # Send *count* elements of type *T* from given pointer *buf* to the
+    # `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_ready_send(buf : Pointer(T), count : Count, tag : Tag = 0) : Request forall T
+      MPI.err? LibMPI.irsend(buf, count, T.to_mpi_datatype, self.destination_rank, tag, self.comm, out request)
+      Request.new(request)
+    end
+
+    # Initiate an immediate (non-blocking) ready mode send operation.
+    #
+    # Send contents of given collection of type *T* to the `Destination` self
+    # and tag it.
+    #
+    # Standard section(s)
+    #  - 3.7.2
+    def immediate_ready_send(col : Slice(Equivalence) | Array(Equivalence) | StaticArray(Equivalence, N), tag : Tag = 0) : Request forall N
+      self.immediate_ready_send(col.to_unsafe, col.size, tag)
+    end
+
+    # Initiate an immediate (non-blocking) ready mode send operation.
+    #
+    # Send contents of given string to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #  - 3.7.2
+    def immediate_ready_send(str : String, tag : Tag = 0) : Request
+      self.immediate_ready_send(str.to_unsafe, str.bytesize, tag)
+    end
+
+    # Initiate an immediate (non-blocking) ready mode send operation.
+    #
+    # Send the given *obj* to the `Destination` self and tag it.
+    #
+    # Standard section(s)
+    #   - 3.7.2
+    def immediate_ready_send(obj : Equivalence, tag : Tag = 0) : Request
+      self.immediate_ready_send(pointerof(obj), 1, tag)
     end
   end
 

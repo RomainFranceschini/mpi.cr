@@ -42,6 +42,17 @@ module MPI
       Status.new(status)
     end
 
+    # Wait for a communication request to finish.
+    #
+    # Will block execution of the calling process until the associated operation
+    # has finished.
+    #
+    # Standard section(s)
+    #   - 3.7.3
+    def wait_without_status
+      MPI.err? LibMPI.wait(pointerof(@raw), LibMPI::STATUS_IGNORE)
+    end
+
     # Cancel a communication request.
     #
     # Examples
