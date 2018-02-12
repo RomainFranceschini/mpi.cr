@@ -14,6 +14,7 @@ lib LibCRMPI
   $kCRMPI_REQUEST_NULL : LibMPI::Request
 
   $kCRMPI_STATUS_IGNORE : LibMPI::Status
+  $kCRMPI_STATUSES_IGNORE : LibMPI::Status
 
   $kCRMPI_MAX : LibMPI::Op
   $kCRMPI_MIN : LibMPI::Op

@@ -15,6 +15,7 @@ extern const MPI_Message kCRMPI_MESSAGE_NO_PROC;
 extern const MPI_Request kCRMPI_REQUEST_NULL;
 
 extern const MPI_Status* kCRMPI_STATUS_IGNORE;
+extern const MPI_Status* kCRMPI_STATUSES_IGNORE;
 
 extern const MPI_Op kCRMPI_MAX;
 extern const MPI_Op kCRMPI_MIN;
