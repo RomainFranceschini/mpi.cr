@@ -260,6 +260,49 @@ module MPI
       self.all_reduce(pointerof(x), ptr, 1, op)
       ptr.value
     end
+
+    # Initiates a non-blocking global reduction under the given operation of
+    # the input data in *sendbuf* and stores the result in *recvbuf* on all
+    # processes.
+    #
+    # Examples
+    # See `examples/immediate_reduce.cr`
+    #
+    # Standard section(s)
+    # 5.12.8
+    def immediate_all_reduce(sendbuf : Pointer(T), recvbuf : Pointer(T), count : Count, op : Operation) : Request forall T
+      MPI.err?(LibMPI.iall_reduce(
+        sendbuf,
+        recvbuf,
+        count,
+        T.to_mpi_datatype,
+        op,
+        self,
+        out request
+      ))
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_all_reduce(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), op : Operation) : ReceiveFutureSlice(T) forall T, N
+      slice = Slice(T).new(sendbuf.size)
+      req = self.immediate_all_reduce(sendbuf, slice.to_unsafe, sendbuf.size, op)
+      ReceiveFutureSlice(T).new(slice, req)
+    end
+
+    # ditto
+    def immediate_all_reduce(str : String, op : Operation) : ReceiveFutureString
+      chars = Pointer(UInt8).malloc(recvcount)
+      req = self.immediate_all_reduce(str.to_unsafe, chars, str.bytesize, op)
+      ReceiveFutureString.new(chars, req)
+    end
+
+    # ditto
+    def immediate_all_reduce(x : T, op : Operation) : ReceiveFuture(T) forall T
+      ptr = Pointer(T).malloc
+      req = self.immediate_all_reduce(pointerof(x), ptr, 1, op)
+      ReceiveFuture(T).new(ptr, req)
+    end
   end
 
   # Something that can take the role of *master* in a collective operation.
@@ -663,6 +706,48 @@ module MPI
       x
     end
 
+    # Initiates a non-blocking global reduction under the operation *op* of the
+    # input data in *buf* and stores the result on the `Master` process.
+    #
+    # This function *must* be called on all non-master processes.
+    #
+    # Examples
+    # See *examples/immediate_reduce.cr*
+    #
+    # Standard section(s)
+    # 5.12.7
+    def immediate_reduce(buf : Pointer(T), count : Count, op : Operation) : Request forall T
+      if self.comm.rank == self.master_rank
+        raise "#immediate_reduce must be called on non-master processes."
+      end
+      MPI.err?(LibMPI.ireduce(
+        buf,
+        nil,
+        count,
+        T.to_mpi_datatype,
+        op,
+        self.master_rank,
+        self.comm,
+        out request
+      ))
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_reduce(buf : Slice(T) | StaticArray(T, N), op : Operation) : Request forall T
+      self.immediate_reduce(buf.to_unsafe, buf.size, op)
+    end
+
+    # ditto
+    def immediate_reduce(buf : String, op : Operation) : Request forall T
+      self.immediate_reduce(buf.to_unsafe, buf.bytesize, op)
+    end
+
+    # ditto
+    def immediate_reduce(x : T, op : Operation) : Request forall T
+      self.immediate_reduce(pointerof(x), 1, op)
+    end
+
     # Performs a global reduction under the operation *op* of the input data in
     # *sendbuf* and stores the result on the `Master` process.
     #
@@ -713,6 +798,62 @@ module MPI
     def master_reduce(x : T, r : T, op : Operation) : T forall T
       self.master_reduce(pointerof(x), pointerof(r), 1, op)
       r
+    end
+
+    # Initiates a non-blocking global reduction under the operation *op* of the
+    # input data in *sendbuf* and stores the result on the `Master` process.
+    #
+    # This function *must* be called on the master process.
+    #
+    # Examples
+    # See *examples/immediate_reduce.cr*
+    #
+    # Standard section(s)
+    # 5.12.7
+    def immediate_master_reduce(sendbuf : Pointer(T), recvbuf : Pointer(T), count : Count, op : Operation) forall T
+      if self.comm.rank != self.master_rank
+        raise "#immediate_master_reduce must be called on the master process."
+      end
+
+      MPI.err?(LibMPI.ireduce(
+        sendbuf,
+        recvbuf,
+        count,
+        T.to_mpi_datatype,
+        op,
+        self.master_rank,
+        self.comm,
+        out request
+      ))
+
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_master_reduce(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), op : Operation) : ReceiveFutureSlice(T) forall T, N
+      slice = Slice(T).new(sendbuf.size)
+      req = self.immediate_master_reduce(sendbuf, slice.to_unsafe, sendbuf.size, op)
+      slice
+      ReceiveFutureSlice(T).new(slice, req)
+    end
+
+    # ditto
+    def immediate_master_reduce(str : String, op : Operation) : ReceiveFutureString
+      chars = Pointer(UInt8).malloc(str.size)
+      req = self.immediate_master_reduce(str.to_unsafe, chars, str.bytesize, op)
+      ReceiveFutureString.new(chars, req)
+    end
+
+    # ditto
+    def immediate_master_reduce(x : T, op : Operation) : ReceiveFuture(T) forall T
+      ptr = Pointer(T).malloc
+      req = self.immediate_master_reduce(pointerof(x), ptr, 1, op)
+      ReceiveFuture(T).new(ptr, req)
+    end
+
+    # ditto
+    def immediate_master_reduce(x : T, r : T, op : Operation) : Request forall T
+      self.immediate_master_reduce(pointerof(x), pointerof(r), 1, op)
     end
   end
 

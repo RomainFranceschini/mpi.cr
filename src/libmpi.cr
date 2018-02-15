@@ -195,10 +195,12 @@ lib LibMPI
   fun scatter = MPI_Scatter(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
   fun scatterv = MPI_Scatterv(sendbuf : Void*, sendcounts : LibC::Int*, displs : LibC::Int*, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
   fun reduce = MPI_Reduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, root : LibC::Int, comm : Comm) : ErrCode
+  fun ireduce = MPI_Ireduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
   fun reduce_local = MPI_Reduce_local(inbuf : Void*, inoutbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op) : ErrCode
   fun all_gather = MPI_Allgather(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, comm : Comm) : ErrCode
   fun all_to_all = MPI_Alltoall(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, comm : Comm) : ErrCode
   fun all_reduce = MPI_Allreduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm) : ErrCode
   fun ibcast = MPI_Ibcast(buffer : Void*, count : LibC::Int, datatype : Datatype, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
   fun iall_gather = MPI_Iallgather(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, comm : Comm, request : Request*) : LibC::Int
+  fun iall_reduce = MPI_Iallreduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm, request : Request*) : LibC::Int
 end
