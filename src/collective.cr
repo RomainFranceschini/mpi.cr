@@ -365,6 +365,43 @@ module MPI
       self.gather(pointerof(x), 1)
     end
 
+    # Initiate non-blocking gather of the contents of all *buf*s on `Master`.
+    #
+    # After the call completes, the contents of the `Master`s on all ranks will
+    # be concatenated into the buffer on `Master`.
+    #
+    # All send buffers must have the same count of elements.
+    #
+    # This function *must* be called on all non-master processes.
+    #
+    # Examples
+    # See *examples/immediate_gather.cr*
+    #
+    # Standard section(s)
+    # 5.12.3
+    def immediate_gather(buf : Pointer(T), count : Count) : Request forall T
+      if self.comm.rank == self.master_rank
+        raise "#immediate_gather must be called on non-master processes."
+      end
+      MPI.err? LibMPI.igather(buf, count, T.to_mpi_datatype, nil, 0, UInt8.to_mpi_datatype, self.master_rank, self.comm, out request)
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_gather(buf : Slice(T) | StaticArray(T, N) | Array(T)) : Request forall T
+      self.immediate_gather(buf.to_unsafe, buf.size)
+    end
+
+    # ditto
+    def immediate_gather(buf : String) : Request forall T
+      self.immediate_gather(buf.to_unsafe, buf.bytesize)
+    end
+
+    # ditto
+    def immediate_gather(x : T) : Request forall T
+      self.immediate_gather(pointerof(x), 1)
+    end
+
     # Gather contents of buffers on `Master`.
     #
     # After the call completes, the contents of the buffers on all ranks will
@@ -408,10 +445,66 @@ module MPI
     end
 
     # ditto
-    def master_gather(x : T.class, recvcount) : Slice(T)
+    def master_gather(x : T, recvcount) : Slice(T) forall T
       slice = Slice(T).new(recvcount)
       self.master_gather(pointerof(x), 1, slice.to_unsafe, slice.size)
       slice
+    end
+
+    # Initiate non-blocking gather of the contents of all *sendbuf*s on
+    # `Master`.
+    #
+    # This function *must* be called on the master process.
+    #
+    # Examples
+    # See *examples/immediate_gather.cr*
+    #
+    # Standard section(s)
+    # 5.12.3
+    def immediate_master_gather(sendbuf : Pointer(T), sendcount : Count, recvbuf : Pointer(U), recvcount : Count) : Request forall T, U
+      if self.comm.rank != self.master_rank
+        raise "#immediate_master_gather must be called on the master process."
+      end
+      recvcount = recvcount / self.comm.size
+      MPI.err? LibMPI.igather(
+        sendbuf,
+        sendcount,
+        T.to_mpi_datatype,
+        recvbuf,
+        recvcount,
+        U.to_mpi_datatype,
+        self.master_rank,
+        self.comm,
+        out request
+      )
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_master_gather(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), recvcount : Count) : ReceiveFutureSlice(T) forall T, N
+      slice = Slice(T).new(recvcount)
+      req = self.immediate_master_gather(sendbuf.to_unsafe, sendbuf.size, slice.to_unsafe, slice.size)
+      ReceiveFutureSlice(T).new(slice, req)
+    end
+
+    def immediate_master_gather(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), recvcount : Count, recvtype : U.class) : ReceiveFutureSlice(U) forall T, N, U
+      slice = Slice(U).new(recvcount)
+      req = self.immediate_master_gather(sendbuf.to_unsafe, sendbuf.size, slice.to_unsafe, slice.size)
+      ReceiveFutureSlice(U).new(slice, req)
+    end
+
+    # ditto
+    def immediate_master_gather(str : String, recvcount : Count) : ReceiveFutureString
+      chars = Pointer(UInt8).malloc(recvcount)
+      req = self.immediate_master_gather(str.to_unsafe, str.bytesize, chars, recvcount)
+      ReceiveFutureString.new(chars, req)
+    end
+
+    # ditto
+    def immediate_master_gather(x : T, recvcount) : ReceiveFutureSlice(T) forall T
+      slice = Slice(T).new(recvcount)
+      req = self.immediate_master_gather(pointerof(x), 1, slice.to_unsafe, slice.size)
+      ReceiveFutureSlice(T).new(slice, req)
     end
 
     # Scatter contents of a buffer on the root process to all processes.
@@ -444,6 +537,7 @@ module MPI
       ))
     end
 
+    # ditto
     def scatter(x : T.class) : T forall T
       res = Pointer(T).malloc
       self.scatter(res, 1)

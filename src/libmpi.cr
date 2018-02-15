@@ -190,6 +190,8 @@ lib LibMPI
   fun bcast = MPI_Bcast(buffer : Void*, count : LibC::Int, datatype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
   fun gather = MPI_Gather(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
   fun gatherv = MPI_Gatherv(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcounts : LibC::Int*, displs : LibC::Int*, recvtype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
+  fun igather = MPI_Igather(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
+  fun igatherv = MPI_Igatherv(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcounts : LibC::Int*, displs : LibC::Int*, recvtype : Datatype, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
   fun scatter = MPI_Scatter(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
   fun scatterv = MPI_Scatterv(sendbuf : Void*, sendcounts : LibC::Int*, displs : LibC::Int*, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
   fun reduce = MPI_Reduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, root : LibC::Int, comm : Comm) : ErrCode
