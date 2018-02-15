@@ -60,10 +60,8 @@ module MPI
     #
     # Standard section(s)
     #   - 3.8.4
-    def cancel : Bool
-      MPI.err? LibMPI.cancel(self)
-      MPI.err? LibMPI.request_free(pointerof(@raw))
-      null?
+    def cancel
+      MPI.err? LibMPI.cancel(pointerof(@raw))
     end
 
     # Tests for the completion of a request.
@@ -76,7 +74,7 @@ module MPI
     #
     # Standard section(s)
     #   - 3.7.3
-    def status : Status?
+    def test_completion : Status?
       MPI.err? LibMPI.test(pointerof(@raw), out flag, out status)
       if flag != 0 # complete
         Status.new(status)
@@ -89,11 +87,38 @@ module MPI
     #
     # Returns *true* if the operations has finished, otherwise returns *false*.
     def completed? : Bool
-      self.status != nil
+      self.test_completion != nil
     end
 
     def to_unsafe
       @raw
+    end
+  end
+
+  # A `ReceiveFuture` represents a value of type `T` received via a
+  # non-blocking receive operation.
+  struct ReceiveFuture(T)
+    getter request
+
+    def initialize(@data : Pointer(T), @request : Request)
+    end
+
+    # Wait for the receive operation to finish and return the received data.
+    def get : {T, Status}
+      status = @request.wait
+      {@data.value, status}
+    end
+
+    # Check whether the receive operation has finished.
+    #
+    # It the operation is complete, the received data is returned. Otherwise,
+    # *nil* is returned.
+    def try : {T, Status}?
+      if status = @request.test_completion
+        {@data.value, status}
+      else
+        nil
+      end
     end
   end
 end

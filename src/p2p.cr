@@ -495,22 +495,6 @@ module MPI
     end
   end
 
-  # A `ReceiveFuture` represents a value of type `T` received via a
-  # non-blocking receive operation.
-  struct ReceiveFuture(T)
-    def initialize(@data : Pointer(T), @request : Request)
-    end
-
-    # Wait for the receive operation to finish and return the received data.
-    def get : {T, Status}
-      status = @request.wait
-      if status.count(T.to_mpi_datatype) == 0
-        raise "Received an empty message into #{self}."
-      end
-      {@data.value, status}
-    end
-  end
-
   # Something that can be used as the destination in a point to point send
   # operation.
   #
@@ -892,9 +876,4 @@ module MPI
       self.rank
     end
   end
-
-  # struct ReceiveFuture(T)
-
-  #   def initialize(@val : T, @req )
-  # end
 end
