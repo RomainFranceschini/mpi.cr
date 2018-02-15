@@ -81,7 +81,7 @@ module MPI
     # All send buffers must contain the same count of elements.
     #
     # Examples
-    # See *examples/all_gather.rs*
+    # See *examples/all_gather.cr*
     #
     # Standard section(s)
     #   5.7
@@ -117,10 +117,58 @@ module MPI
     end
 
     # ditto
-    def all_gather(x : T, recvcount) : Slice(T) forall T
+    def all_gather(x : T, recvcount : Count) : Slice(T) forall T
       slice = Slice(T).new(recvcount)
       self.all_gather(pointerof(x), 1, slice.to_unsafe, slice.size)
       slice
+    end
+
+    # Initiate non-blocking gather of the contents of all `sendbuf`s into all
+    # `rcevbuf`s on all processes in the communicator.
+    #
+    # Examples
+    # See *examples/immediate_all_gather.cr*
+    #
+    # Standard section(s)
+    #   5.12.5
+    def immediate_all_gather(sendbuf : Pointer(T), sendcount : Count, recvbuf : Pointer(U), recvcount : Count) : Request forall T, U
+      MPI.err?(LibMPI.iall_gather(
+        sendbuf,
+        sendcount,
+        T.to_mpi_datatype,
+        recvbuf,
+        recvcount / self.size,
+        U.to_mpi_datatype,
+        self,
+        out request
+      ))
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_all_gather(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), recvcount : Count, recvtype : U.class) : ReceiveFutureSlice(U) forall T, U, N
+      slice = Slice(U).new(recvcount)
+      req = self.immediate_all_gather(sendbuf.to_unsafe, sendbuf.size, slice.to_unsafe, slice.size)
+      ReceiveFutureSlice(U).new(slice, req)
+    end
+
+    # ditto
+    def immediate_all_gather(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), recvcount : Count) : ReceiveFutureSlice(T) forall T, N
+      self.immediate_all_gather(sendbuf, recvcount, T)
+    end
+
+    # ditto
+    def immediate_all_gather(str : String, recvcount : Count) : ReceiveFutureString
+      chars = Pointer(UInt8).malloc(recvcount)
+      req = self.immediate_all_gather(str.to_unsafe, str.bytesize, chars, recvcount)
+      ReceiveFutureString.new(chars, req)
+    end
+
+    # ditto
+    def immediate_all_gather(x : T, recvcount : Count) : ReceiveFutureSlice(T) forall T
+      slice = Slice(T).new(recvcount)
+      req = self.immediate_all_gather(pointerof(x), 1, slice.to_unsafe, slice.size)
+      ReceiveFutureSlice(T).new(slice, req)
     end
 
     # Distribute the send buffers from all processes to the receive buffers on

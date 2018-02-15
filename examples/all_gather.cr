@@ -30,4 +30,10 @@ MPI.init do |universe|
   assert (0u64..Float64::INFINITY).each.zip(slice.each).all? { |a, b|
     b == (a / count + 1) * (a % count + 1)
   }
+
+  # slice = world.all_gather(world.rank % 2 == 0, count)
+  # answer = (0...count).map { |i| i % 2 == 0 }
+  # assert slice == answer
+
+  # d = MPI::UserDatatype.contiguous(count, UInt64)
 end

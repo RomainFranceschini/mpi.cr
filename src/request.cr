@@ -248,4 +248,54 @@ module MPI
       end
     end
   end
+
+  # A `ReceiveFutureSlice` represents a slice of values of type `T` received
+  # via a non-blocking receive operation.
+  struct ReceiveFutureSlice(T)
+    def initialize(@slice : Slice(T), @request : Request)
+    end
+
+    # Wait for the receive operation to finish and return the received slice.
+    def get : {Slice(T), Status}
+      status = @request.wait
+      {@slice, status}
+    end
+
+    # Check whether the receive operation has finished.
+    #
+    # It the operation is complete, the received slice is returned. Otherwise,
+    # *nil* is returned.
+    def try : {T, Status}?
+      if status = @request.test_completion
+        {@slice, status}
+      else
+        nil
+      end
+    end
+  end
+
+  # A `ReceiveFuture` represents a string received via a
+  # non-blocking operation.
+  struct ReceiveFutureString
+    def initialize(@data : Pointer(UInt8), @request : Request)
+    end
+
+    # Wait for the receive operation to finish and return the received data.
+    def get : {String, Status}
+      status = @request.wait
+      {String.new(@data), status}
+    end
+
+    # Check whether the receive operation has finished.
+    #
+    # It the operation is complete, the received data is returned. Otherwise,
+    # *nil* is returned.
+    def try : {String, Status}?
+      if status = @request.test_completion
+        {String.new(@data), status}
+      else
+        nil
+      end
+    end
+  end
 end
