@@ -194,6 +194,7 @@ lib LibMPI
   fun igatherv = MPI_Igatherv(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcounts : LibC::Int*, displs : LibC::Int*, recvtype : Datatype, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
   fun scatter = MPI_Scatter(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
   fun scatterv = MPI_Scatterv(sendbuf : Void*, sendcounts : LibC::Int*, displs : LibC::Int*, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm) : ErrCode
+  fun iscatter = MPI_Iscatter(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
   fun reduce = MPI_Reduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, root : LibC::Int, comm : Comm) : ErrCode
   fun ireduce = MPI_Ireduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
   fun reduce_local = MPI_Reduce_local(inbuf : Void*, inoutbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op) : ErrCode

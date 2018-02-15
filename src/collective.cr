@@ -613,6 +613,60 @@ module MPI
       slice
     end
 
+    # Initiates a non-blocking scatter of the contents of a buffer on the
+    # `Master` process to all processes.
+    #
+    # After the call completes, each participating process will have received
+    # a part of the send buffer from the master process.
+    #
+    # All send buffers must have the same count of elements.
+    #
+    # This function *must* be called on all non-master processes.
+    #
+    # Examples
+    # See *examples/immediate_scatter.cr*
+    #
+    # Standard section(s)
+    # 5.12.4
+    def immediate_scatter(buf : Pointer(T), count : Count) : Request forall T
+      if self.comm.rank == self.master_rank
+        raise "#immediate_scatter must be called on non-master processes."
+      end
+      MPI.err?(LibMPI.iscatter(
+        nil,
+        0,
+        UInt8.to_mpi_datatype,
+        buf,
+        count,
+        T.to_mpi_datatype,
+        self.master_rank,
+        self.comm,
+        out request
+      ))
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_scatter(x : T.class) : ReceiveFuture(T) forall T
+      ptr = Pointer(T).malloc
+      req = self.immediate_scatter(ptr, 1)
+      ReceiveFuture(T).new(ptr, req)
+    end
+
+    # ditto
+    def immediate_scatter_string(recvcount : Count) : ReceiveFutureString
+      chars = Pointer(UInt8).malloc(recvcount)
+      req = self.immediate_scatter(chars, recvcount)
+      ReceiveFutureString.new(chars, req)
+    end
+
+    # ditto
+    def immediate_scatter_slice(x : T.class, recvcount : Count) : ReceiveFutureSlice(T) forall T
+      slice = Slice(T).new(recvcount)
+      req = self.immediate_scatter(slice.to_unsafe, recvcount)
+      ReceiveFutureSlice(T).new(slice, req)
+    end
+
     # Scatter contents of buffers on `Master`.
     #
     # After the call completes, each participarting process will have received
@@ -663,6 +717,60 @@ module MPI
       ptr = Pointer(T).malloc
       self.master_scatter(sendbuf.to_unsafe, sendbuf.size, ptr, 1)
       ptr.value
+    end
+
+    # Initiates non-blocking scatter of the contents of buffers from `Master`.
+    #
+    # After the call completes, each participarting process will have received
+    # a part of the send buffer from the `Master` process.
+    #
+    # All receive buffers must have the same count of elements.
+    #
+    # This function *must* be called on the master process.
+    #
+    # Examples
+    # See *examples/immediate_scatter.cr*
+    #
+    # Standard section(s)
+    # 5.12.4
+    def immediate_master_scatter(sendbuf : Pointer(T), sendcount : Count, recvbuf : Pointer(U), recvcount : Count) : Request forall T, U
+      if self.comm.rank != self.master_rank
+        raise "#immediate_master_scatter must be called on the master process."
+      end
+      sendcount = sendcount / self.comm.size
+      MPI.err?(LibMPI.iscatter(
+        sendbuf,
+        sendcount,
+        T.to_mpi_datatype,
+        recvbuf,
+        recvcount,
+        U.to_mpi_datatype,
+        self.master_rank,
+        self.comm,
+        out request
+      ))
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_master_scatter(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), recvcount : Count) : ReceiveFutureSlice(T) forall T
+      slice = Slice(T).new(recvcount)
+      req = self.immediate_master_scatter(sendbuf.to_unsafe, sendbuf.size, slice.to_unsafe, slice.size)
+      ReceiveFutureSlice(T).new(slice, req)
+    end
+
+    # ditto
+    def immediate_master_scatter(str : String, recvcount : Count) : ReceiveFutureString
+      chars = Pointer(UInt8).malloc(recvcount)
+      req = self.immediate_master_scatter(str.to_unsafe, str.bytesize, chars, recvcount)
+      ReceiveFutureString.new(chars, req)
+    end
+
+    # ditto
+    def immediate_master_scatter(sendbuf : Slice(T) | Array(T) | StaticArray(T, N)) : ReceiveFuture(T) forall T, N
+      ptr = Pointer(T).malloc
+      req = self.immediate_master_scatter(sendbuf.to_unsafe, sendbuf.size, ptr, 1)
+      ReceiveFuture(T).new(ptr, req)
     end
 
     # Performs a global reduction under the operation *op* of the input data in
