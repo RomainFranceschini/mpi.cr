@@ -134,6 +134,12 @@ lib LibMPI
   fun test = MPI_Test(request : Request*, flag : LibC::Int*, status : Status*) : ErrCode
   fun request_free = MPI_Request_free(request : Request*) : ErrCode
   fun cancel = MPI_Cancel(request : Request*) : ErrCode
+  fun wait_any = MPI_Waitany(count : LibC::Int, array_of_requests : Request*, indx : LibC::Int*, status : Status*) : LibC::Int
+  fun test_any = MPI_Testany(count : LibC::Int, array_of_requests : Request*, indx : LibC::Int*, flag : LibC::Int*, status : Status*) : LibC::Int
+  fun wait_all = MPI_Waitall(count : LibC::Int, array_of_requests : Request*, array_of_statuses : Status*) : LibC::Int
+  fun test_all = MPI_Testall(count : LibC::Int, array_of_requests : Request*, flag : LibC::Int*, array_of_statuses : Status*) : LibC::Int
+  fun wait_some = MPI_Waitsome(incount : LibC::Int, array_of_requests : Request*, outcount : LibC::Int*, array_of_indices : LibC::Int*, array_of_statuses : Status*) : LibC::Int
+  fun test_some = MPI_Testsome(incount : LibC::Int, array_of_requests : Request*, outcount : LibC::Int*, array_of_indices : LibC::Int*, array_of_statuses : Status*) : LibC::Int
 
   # Groups
 

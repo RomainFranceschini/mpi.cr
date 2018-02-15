@@ -2,18 +2,145 @@ module MPI
   # Request objects for non-blocking operations
   #
   # Non-blocking operations such as `Process#immediate_send` return request
-  # objects that borrow any buffers involved in the operation so as to ensure
-  # proper access restrictions. In order to release the borrowed buffers from
+  # objects that captures any buffers involved in the operation so as to ensure
+  # proper access restrictions. In order to release the captured buffers from
   # the request objects, a completion operation such as `#wait` or
   # `#completed?` must be used on the request object.
-  #
-  # Unfinished features
-  # - **3.7**: Nonblocking mode:
-  #   - Completion, MPI_Waitany(), MPI_Waitall(), MPI_Waitsome(),
-  #   MPI_Testany(), MPI_Testall(), MPI_Testsome(), MPI_Request_get_status()
-  # - **3.8**:
-  #   - Cancellation, MPI_Cancel(), MPI_Test_cancelled()
   struct Request
+    # Blocks until one of the operations associated with the given `Request`s
+    # has completed.
+    #
+    # Returns the index associated with the completed operation, or *nil* if
+    # *requests* contains no active requests.
+    #
+    # Standard section(s)
+    #   - 3.7.5
+    def self.wait_any(requests : Array(Request)) : {Int32, Status}?
+      raw_requests = requests.to_unsafe.as(Pointer(LibMPI::Request))
+      MPI.err? LibMPI.wait_any(requests.size, raw_requests, out index, out status)
+      if index == LibMPI::UNDEFINED
+        nil
+      else
+        {index, Status.new(status)}
+      end
+    end
+
+    # Tests for the completion of either one or none of the operations
+    # associated with the given `Request`s.
+    #
+    # Returns the index associated with the completed operation, or *nil* if
+    # *requests* contains no active requests.
+    #
+    # Standard section(s)
+    #   - 3.7.5
+    def self.test_any(requests : Array(Request)) : {Int32, Status}?
+      raw_requests = requests.to_unsafe.as(Pointer(LibMPI::Request))
+      MPI.err? LibMPI.test_any(requests.size, raw_requests, out index, out flag, out status)
+
+      if flag != 0 && index != LibMPI::UNDEFINED
+        {index, Status.new(status)}
+      else
+        nil
+      end
+    end
+
+    # Blocks until at least one of the operations associated with the given
+    # `Request`s have completed.
+    #
+    # Returns an array filled with the operations that have completed.
+    #
+    # Examples
+    # See *examples/wait_some.cr*
+    #
+    # Standard section(s)
+    #   - 3.7.5
+    def self.wait_some(requests : Array(Request)) : Array({Int32, Status})
+      indices = Pointer(LibC::Int).malloc(requests.size)
+      statuses = Pointer(LibMPI::Status).malloc(requests.size)
+      raw_requests = requests.to_unsafe.as(Pointer(LibMPI::Request))
+
+      MPI.err? LibMPI.wait_some(requests.size, raw_requests, out outcount, indices, statuses)
+
+      if outcount == LibMPI::UNDEFINED
+        Array({Int32, Status}).new(0)
+      else
+        ary = Array({Int32, Status}).new(outcount)
+        outcount.times do |i|
+          ary << {indices[i], Status.new(statuses[i])}
+        end
+        ary
+      end
+    end
+
+    # Test for the completion of at least one of the operations associated with
+    # the given `Request`s.
+    #
+    # Returns an array filled with the operations that have completed.
+    #
+    # Standard section(s)
+    #   - 3.7.5
+    def self.test_some(requests : Array(Request)) : Array({Int32, Status})
+      indices = Pointer(LibC::Int).malloc(requests.size)
+      statuses = Pointer(LibMPI::Status).malloc(requests.size)
+      raw_requests = requests.to_unsafe.as(Pointer(LibMPI::Request))
+
+      MPI.err? LibMPI.test_some(requests.size, raw_requests, out outcount, indices, statuses)
+
+      if outcount == LibMPI::UNDEFINED
+        Array({Int32, Status}).new(0)
+      else
+        ary = Array({Int32, Status}).new(outcount)
+        outcount.times do |i|
+          ary << {indices[i], Status.new(statuses[i])}
+        end
+        ary
+      end
+    end
+
+    # Blocks until all operations associated with the given `Request`s complete.
+    #
+    # Returns an array filled with corresponding `Status`es of each request.
+    #
+    # Standard section(s)
+    #   - 3.7.5
+    def self.wait_all(requests : Array(Request)) : Array(Status)
+      statuses = Pointer(LibMPI::Status).malloc(requests.size)
+      raw_requests = requests.to_unsafe.as(Pointer(LibMPI::Request))
+
+      MPI.err? LibMPI.wait_all(requests.size, raw_requests, statuses)
+
+      ary = Array(Status).new(requests.size)
+      requests.size.times do |i|
+        ary << Status.new(status)
+      end
+      ary
+    end
+
+    # Test whether all operations associated with the given `Request`s are
+    # complete.
+    #
+    # Returns an array filled with corresponding `Status`es of each request, or
+    # *nil* if all operations are not complete.
+    #
+    # Standard section(s)
+    #   - 3.7.5
+    def self.test_all(requests : Array(Request)) : Array(Status)?
+      statuses = Pointer(LibMPI::Status).malloc(requests.size)
+      raw_requests = requests.to_unsafe.as(Pointer(LibMPI::Request))
+
+      MPI.err? LibMPI.test_all(requests.size, raw_requests, out flag, statuses)
+
+      if flag != 0
+        ary = Array(Status).new(requests.size)
+        requests.size.times do |i|
+          ary << Status.new(status)
+        end
+        ary
+      else
+        nil
+      end
+    end
+
     # Returns a null request.
     def self.null
       Request.new(LibMPI::REQUEST_NULL)
