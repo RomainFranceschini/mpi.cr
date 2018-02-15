@@ -301,6 +301,34 @@ module MPI
       x
     end
 
+    # Initiate broadcast of a value from the `Master` process to all
+    # other processes.
+    #
+    # Examples
+    # See *examples/immediate_broadcast.cr*
+    #
+    # Standard section(s)
+    # 5.12.2
+    def immediate_broadcast(buf : Pointer(T), count : Count) : Request forall T
+      MPI.err? LibMPI.ibcast(buf, count, T.to_mpi_datatype, self.master_rank, self.comm, out request)
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_broadcast(buf : Slice(T) | StaticArray(T, N) | Array(T)) : Request forall T, N
+      self.immediate_broadcast(buf.to_unsafe, buf.size)
+    end
+
+    # ditto
+    def immediate_broadcast(str : String) : Request
+      self.immediate_broadcast(str.to_unsafe, str.bytesize)
+    end
+
+    # ditto
+    def immediate_broadcast(buf : Pointer(T)) : Request forall T
+      req = self.immediate_broadcast(buf, 1)
+    end
+
     # Gather contents of buffers on `Master`.
     #
     # After the call completes, the contents of the `Master`s on all ranks will
