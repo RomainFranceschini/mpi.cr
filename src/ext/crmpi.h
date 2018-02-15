@@ -28,6 +28,7 @@ extern const MPI_Op kCRMPI_BOR;
 extern const MPI_Op kCRMPI_LXOR;
 extern const MPI_Op kCRMPI_BXOR;
 
+extern const MPI_Datatype kCRMPI_BOOL;
 extern const MPI_Datatype kCRMPI_FLOAT;
 extern const MPI_Datatype kCRMPI_DOUBLE;
 extern const MPI_Datatype kCRMPI_INT8_T;

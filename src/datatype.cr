@@ -91,6 +91,7 @@ module MPI
     {% end %}
   end
 
+  def_mpi_equivalence(Bool, LibMPI::BOOL)
   def_mpi_equivalence(Float32, LibMPI::FLOAT)
   def_mpi_equivalence(Float64, LibMPI::DOUBLE)
 

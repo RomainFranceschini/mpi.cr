@@ -27,6 +27,7 @@ lib LibCRMPI
   $kCRMPI_LXOR : LibMPI::Op
   $kCRMPI_BXOR : LibMPI::Op
 
+  $kCRMPI_BOOL : LibMPI::Datatype
   $kCRMPI_FLOAT : LibMPI::Datatype
   $kCRMPI_DOUBLE : LibMPI::Datatype
   $kCRMPI_INT8_T : LibMPI::Datatype

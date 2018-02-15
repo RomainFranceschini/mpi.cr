@@ -26,6 +26,7 @@ const MPI_Op kCRMPI_BOR = MPI_BOR;
 const MPI_Op kCRMPI_LXOR = MPI_LXOR;
 const MPI_Op kCRMPI_BXOR = MPI_BXOR;
 
+const MPI_Datatype kCRMPI_BOOL = MPI_C_BOOL;
 const MPI_Datatype kCRMPI_FLOAT = MPI_FLOAT;
 const MPI_Datatype kCRMPI_DOUBLE = MPI_DOUBLE;
 const MPI_Datatype kCRMPI_INT8_T = MPI_INT8_T;
