@@ -6,9 +6,30 @@ module MPI
 
     def initialize
       @buffer = Bytes.empty
+      check_compatibility!
     end
 
     def initialize(@buffer : Bytes)
+      check_compatibility!
+    end
+
+    # Check if the runtime MPI implementation match the compile-time
+    # MPI implementation.
+    private def check_compatibility!
+      actual_vendor = case MPI.library_version
+                      when /Open MPI/
+                        "openmpi"
+                      when /MPICH/
+                        "mpich"
+                      else
+                        "unknown"
+                      end
+      if MPI::VENDOR != actual_vendor
+        raise <<-EOF
+        The mpi.cr shard was built to support the #{MPI::VENDOR} MPI implementation, whereas \"#{PROGRAM_NAME}\" was built against #{actual_vendor} implementation.
+        Either reinstall "mpi.cr" dependency or make #{MPI::VENDOR} available in the linker search path.
+        EOF
+      end
     end
 
     # Returns the *world* communicator.
@@ -56,16 +77,16 @@ module MPI
   # Can be called without initializing MPI.
   def self.version : Tuple(LibC::Int, LibC::Int)
     LibMPI.get_version(out version, out subversion)
-    { version, subversion }
+    {version, subversion}
   end
 
   # Describes the version of the MPI library itself as a string.
   #
   # Can be called without initializing MPI.
   def self.library_version : String
-    buf = uninitialized UInt8[LibMPI::MAX_LIBRARY_VERSION_STRING]
+    buf = uninitialized UInt8[8192]
     LibMPI.get_library_version(buf, out len)
-    String.new(buf.to_unsafe)
+    String.new(buf.to_unsafe, len)
   end
 
   # Names the processor that the calling process is running on.
@@ -116,7 +137,7 @@ module MPI
   def self.init(threading : Threading) : Tuple(Universe, Threading)?
     unless MPI.initialized?
       LibMPI.init_thread(nil, nil, threading, out provided)
-      { Universe.new, Threading.new(provided) }
+      {Universe.new, Threading.new(provided)}
     end
   end
 
