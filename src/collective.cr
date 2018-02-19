@@ -182,43 +182,71 @@ module MPI
     #
     # Standard section(s)
     #   5.8
-    def all_to_all(sendbuf : Pointer(T), sendcount : Count, recvbuf : Pointer(U), recvcount : Count) forall T, U
+    def all_to_all(sendbuf : Pointer(T), recvbuf : Pointer(U), count : Count) forall T, U
       size = self.size
       MPI.err?(LibMPI.all_to_all(
         sendbuf,
-        sendcount / size,
+        count / size,
         T.to_mpi_datatype,
         recvbuf,
-        recvcount / size,
+        count / size,
         U.to_mpi_datatype,
         self
       ))
     end
 
     # ditto
-    def all_to_all(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), recvcount : Count, recvtype : U.class) : Slice(T) forall T, U, N
-      slice = Slice(U).new(recvcount)
-      self.all_to_all(sendbuf.to_unsafe, sendbuf.size, slice.to_unsafe, slice.size)
+    def all_to_all(sendbuf : Slice(T) | Array(T) | StaticArray(T, N)) : Slice(T) forall T, N
+      slice = Slice(T).new(sendbuf.size)
+      self.all_to_all(sendbuf.to_unsafe, slice.to_unsafe, sendbuf.size)
       slice
     end
 
     # ditto
-    def all_to_all(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), recvcount : Count) : Slice(T) forall T, N
-      self.all_to_all(sendbuf, recvcount, T)
-    end
-
-    # ditto
-    def all_to_all(str : String, recvcount : Count) : String
-      String.new(recvcount) do |recvbuf|
-        self.all_to_all(str.to_unsafe, str.bytesize, recvbuf, recvcount)
+    def all_to_all(str : String) : String
+      String.new(str.size) do |recvbuf|
+        self.all_to_all(str.to_unsafe, recvbuf, str.bytesize)
       end
     end
 
+    # Initiates a non-blocking all to all distribution, where the send buffers
+    # from all processes to the receive buffers on all processes.
+    #
+    # Each process sends and receives the same count of elements to and from
+    # each process.
+    #
+    # Examples
+    # See *examples/immediate_all_to_all.cr*
+    #
+    # Standard section(s)
+    #   5.12.6
+    def immediate_all_to_all(sendbuf : Pointer(T), recvbuf : Pointer(U), count : Count) : Request forall T, U
+      size = self.size
+      MPI.err?(LibMPI.iall_to_all(
+        sendbuf,
+        count / size,
+        T.to_mpi_datatype,
+        recvbuf,
+        count / size,
+        U.to_mpi_datatype,
+        self,
+        out request
+      ))
+      Request.new(request)
+    end
+
     # ditto
-    def all_to_all(x : T, recvcount) : Slice(T) forall T
-      slice = Slice(T).new(recvcount)
-      self.all_to_all(pointerof(x), 1, slice.to_unsafe, slice.size)
-      slice
+    def immediate_all_to_all(sendbuf : Slice(T) | Array(T) | StaticArray(T, N)) : ReceiveFutureSlice(T) forall T, N
+      slice = Slice(T).new(sendbuf.size)
+      req = self.immediate_all_to_all(sendbuf.to_unsafe, slice.to_unsafe, sendbuf.size)
+      ReceiveFutureSlice(T).new(slice, req)
+    end
+
+    # ditto
+    def immediate_all_to_all(str : String) : ReceiveFutureString
+      chars = Pointer(UInt8).malloc(str.bytesize)
+      req = self.immediate_all_to_all(str.to_unsafe, chars, str.bytesize)
+      ReceiveFutureString.new(chars, req)
     end
 
     # Performs a global reduction under the given operation of the input data

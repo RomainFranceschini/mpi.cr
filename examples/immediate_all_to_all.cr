@@ -6,10 +6,9 @@ MPI.init do |universe|
   size = world.size
 
   u = Slice.new(size, rank)
-  v = world.all_to_all(u) # , size)
+  v, _ = world.immediate_all_to_all(u).get
 
-  pp u
-  pp v
+  pp u, v
 
   assert v.each.zip((0...size).each).all? { |i, j| i == j }
 end

@@ -200,6 +200,7 @@ lib LibMPI
   fun reduce_local = MPI_Reduce_local(inbuf : Void*, inoutbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op) : ErrCode
   fun all_gather = MPI_Allgather(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, comm : Comm) : ErrCode
   fun all_to_all = MPI_Alltoall(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, comm : Comm) : ErrCode
+  fun iall_to_all = MPI_Ialltoall(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, comm : Comm, request : Request*) : LibC::Int
   fun all_reduce = MPI_Allreduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm) : ErrCode
   fun ibcast = MPI_Ibcast(buffer : Void*, count : LibC::Int, datatype : Datatype, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
   fun iall_gather = MPI_Iallgather(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, comm : Comm, request : Request*) : LibC::Int
