@@ -303,6 +303,86 @@ module MPI
       req = self.immediate_all_reduce(pointerof(x), ptr, 1, op)
       ReceiveFuture(T).new(ptr, req)
     end
+
+    # Performs a global inclusive prefix reduction of the given data under the
+    # specified operation.
+    #
+    # Examples
+    # *examples/scan.cr*
+    #
+    # Standard section(s)
+    #   - 5.11.1
+    def scan(sendbuf : Pointer(T), recvbuf : Pointer(T), count : Count, op : Operation) forall T
+      MPI.err? LibMPI.scan(
+        sendbuf,
+        recvbuf,
+        count,
+        T.to_mpi_datatype,
+        op,
+        self
+      )
+    end
+
+    # ditto
+    def scan(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), op : Operation) : Slice(T) forall T, N
+      slice = Slice(T).new(sendbuf.size)
+      self.scan(sendbuf, slice.to_unsafe, sendbuf.size, op)
+      slice
+    end
+
+    # ditto
+    def scan(str : String, op : Operation) : String
+      String.new(str.size) do |buf|
+        self.scan(str.to_unsafe, buf, str.bytesize, op)
+      end
+    end
+
+    # ditto
+    def scan(x : T, op : Operation) : T forall T
+      ptr = Pointer(T).malloc
+      self.scan(pointerof(x), ptr, 1, op)
+      ptr.value
+    end
+
+    # Performs a global exclusive prefix reduction of the given data under the
+    # specified operation.
+    #
+    # Examples
+    # *examples/scan.cr*
+    #
+    # Standard section(s)
+    #   - 5.11.2
+    def exclusive_scan(sendbuf : Pointer(T), recvbuf : Pointer(T), count : Count, op : Operation) forall T
+      MPI.err? LibMPI.exscan(
+        sendbuf,
+        recvbuf,
+        count,
+        T.to_mpi_datatype,
+        op,
+        self
+      )
+    end
+
+    # ditto
+    def exclusive_scan(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), op : Operation) : Slice(T) forall T, N
+      slice = Slice(T).new(sendbuf.size)
+      self.exclusive_scan(sendbuf, slice.to_unsafe, sendbuf.size, op)
+      slice
+    end
+
+    # ditto
+    def exclusive_scan(str : String, op : Operation) : String
+      String.new(str.size) do |buf|
+        self.exclusive_scan(str.to_unsafe, buf, str.bytesize, op)
+      end
+    end
+
+    # ditto
+    def exclusive_scan(x : T, op : Operation) : T forall T
+      ptr = Pointer(T).malloc
+      self.exclusive_scan(pointerof(x), ptr, 1, op)
+      ptr.value
+    end
   end
 
   # Something that can take the role of *master* in a collective operation.

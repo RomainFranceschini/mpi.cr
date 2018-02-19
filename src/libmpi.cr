@@ -204,4 +204,6 @@ lib LibMPI
   fun ibcast = MPI_Ibcast(buffer : Void*, count : LibC::Int, datatype : Datatype, root : LibC::Int, comm : Comm, request : Request*) : LibC::Int
   fun iall_gather = MPI_Iallgather(sendbuf : Void*, sendcount : LibC::Int, sendtype : Datatype, recvbuf : Void*, recvcount : LibC::Int, recvtype : Datatype, comm : Comm, request : Request*) : LibC::Int
   fun iall_reduce = MPI_Iallreduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm, request : Request*) : LibC::Int
+  fun scan = MPI_Scan(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm) : LibC::Int
+  fun exscan = MPI_Exscan(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm) : LibC::Int
 end
