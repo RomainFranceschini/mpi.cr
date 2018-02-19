@@ -206,4 +206,6 @@ lib LibMPI
   fun iall_reduce = MPI_Iallreduce(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm, request : Request*) : LibC::Int
   fun scan = MPI_Scan(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm) : LibC::Int
   fun exscan = MPI_Exscan(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm) : LibC::Int
+  fun iscan = MPI_Iscan(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm, request : Request*) : LibC::Int
+  fun iexscan = MPI_Iexscan(sendbuf : Void*, recvbuf : Void*, count : LibC::Int, datatype : Datatype, op : Op, comm : Comm, request : Request*) : LibC::Int
 end

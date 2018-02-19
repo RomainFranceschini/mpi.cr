@@ -344,6 +344,48 @@ module MPI
       ptr.value
     end
 
+    # Initiates a non-blocking global inclusive prefix reduction of the given
+    # data under the specified operation.
+    #
+    # Examples
+    # *examples/immediate_scan.cr*
+    #
+    # Standard section(s)
+    #   - 5.12.11
+    def immediate_scan(sendbuf : Pointer(T), recvbuf : Pointer(T), count : Count, op : Operation) : Request forall T
+      MPI.err? LibMPI.iscan(
+        sendbuf,
+        recvbuf,
+        count,
+        T.to_mpi_datatype,
+        op,
+        self,
+        out request
+      )
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_scan(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), op : Operation) : ReceiveFutureSlice(T) forall T, N
+      slice = Slice(T).new(sendbuf.size)
+      req = self.immediate_scan(sendbuf, slice.to_unsafe, sendbuf.size, op)
+      ReceiveFutureSlice(T).new(slice, req)
+    end
+
+    # ditto
+    def immediate_scan(str : String, op : Operation) : ReceiveFutureString
+      chars = Pointer(UInt8).malloc(str.bytesize)
+      req = self.immediate_scan(str.to_unsafe, chars, str.bytesize, op)
+      ReceiveFutureString.new(chars, req)
+    end
+
+    # ditto
+    def immediate_scan(x : T, op : Operation) : ReceiveFuture(T) forall T
+      ptr = Pointer(T).malloc
+      req = self.immediate_scan(pointerof(x), ptr, 1, op)
+      ReceiveFuture(T).new(ptr, req)
+    end
+
     # Performs a global exclusive prefix reduction of the given data under the
     # specified operation.
     #
@@ -382,6 +424,48 @@ module MPI
       ptr = Pointer(T).malloc
       self.exclusive_scan(pointerof(x), ptr, 1, op)
       ptr.value
+    end
+
+    # Initiates a non-blocking global exclusive prefix reduction of the given
+    # data under the specified operation.
+    #
+    # Examples
+    # *examples/immediate_scan.cr*
+    #
+    # Standard section(s)
+    #   - 5.12.12
+    def immediate_exclusive_scan(sendbuf : Pointer(T), recvbuf : Pointer(T), count : Count, op : Operation) : Request forall T
+      MPI.err? LibMPI.iexscan(
+        sendbuf,
+        recvbuf,
+        count,
+        T.to_mpi_datatype,
+        op,
+        self,
+        out request
+      )
+      Request.new(request)
+    end
+
+    # ditto
+    def immediate_exclusive_scan(sendbuf : Slice(T) | Array(T) | StaticArray(T, N), op : Operation) : ReceiveFutureSlice(T) forall T, N
+      slice = Slice(T).new(sendbuf.size)
+      req = self.immediate_exclusive_scan(sendbuf, slice.to_unsafe, sendbuf.size, op)
+      ReceiveFutureSlice(T).new(slice, req)
+    end
+
+    # ditto
+    def immediate_exclusive_scan(str : String, op : Operation) : String
+      chars = Pointer(UInt8).malloc(str.bytesize)
+      req = self.immediate_exclusive_scan(str.to_unsafe, chars, str.bytesize, op)
+      ReceiveFutureString.new(chars, req)
+    end
+
+    # ditto
+    def immediate_exclusive_scan(x : T, op : Operation) : ReceiveFuture(T) forall T
+      ptr = Pointer(T).malloc
+      req = self.immediate_exclusive_scan(pointerof(x), ptr, 1, op)
+      ReceiveFuture(T).new(ptr, req)
     end
   end
 
