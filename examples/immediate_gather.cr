@@ -31,7 +31,7 @@ MPI.init do |universe|
       puts chunk
     end
     assert (0u64..Float64::INFINITY).each.zip(slice.each).all? { |a, b|
-      b == (a / count + 1) * (a % count + 1)
+      b == (a // count + 1) * (a % count + 1)
     }
   else
     root_proc.immediate_gather(a).wait

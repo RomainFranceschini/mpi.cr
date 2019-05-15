@@ -91,7 +91,7 @@ module MPI
         sendcount,
         T.to_mpi_datatype,
         recvbuf,
-        recvcount / self.size,
+        recvcount // self.size,
         U.to_mpi_datatype,
         self
       ))
@@ -137,7 +137,7 @@ module MPI
         sendcount,
         T.to_mpi_datatype,
         recvbuf,
-        recvcount / self.size,
+        recvcount // self.size,
         U.to_mpi_datatype,
         self,
         out request
@@ -186,10 +186,10 @@ module MPI
       size = self.size
       MPI.err?(LibMPI.all_to_all(
         sendbuf,
-        count / size,
+        count // size,
         T.to_mpi_datatype,
         recvbuf,
-        count / size,
+        count // size,
         U.to_mpi_datatype,
         self
       ))
@@ -224,10 +224,10 @@ module MPI
       size = self.size
       MPI.err?(LibMPI.iall_to_all(
         sendbuf,
-        count / size,
+        count // size,
         T.to_mpi_datatype,
         recvbuf,
-        count / size,
+        count // size,
         U.to_mpi_datatype,
         self,
         out request
@@ -655,7 +655,7 @@ module MPI
       if self.comm.rank != self.master_rank
         raise "#master_gather must be called on the master process."
       end
-      recvcount = recvcount / self.comm.size
+      recvcount = recvcount // self.comm.size
       MPI.err? LibMPI.gather(sendbuf, sendcount, T.to_mpi_datatype, recvbuf, recvcount, U.to_mpi_datatype, self.master_rank, self.comm)
     end
 
@@ -700,7 +700,7 @@ module MPI
       if self.comm.rank != self.master_rank
         raise "#immediate_master_gather must be called on the master process."
       end
-      recvcount = recvcount / self.comm.size
+      recvcount = recvcount // self.comm.size
       MPI.err? LibMPI.igather(
         sendbuf,
         sendcount,
@@ -877,7 +877,7 @@ module MPI
       if self.comm.rank != self.master_rank
         raise "#master_scatter must be called on the master process."
       end
-      sendcount = sendcount / self.comm.size
+      sendcount = sendcount // self.comm.size
       MPI.err?(LibMPI.scatter(
         sendbuf,
         sendcount,
@@ -929,7 +929,7 @@ module MPI
       if self.comm.rank != self.master_rank
         raise "#immediate_master_scatter must be called on the master process."
       end
-      sendcount = sendcount / self.comm.size
+      sendcount = sendcount // self.comm.size
       MPI.err?(LibMPI.iscatter(
         sendbuf,
         sendcount,

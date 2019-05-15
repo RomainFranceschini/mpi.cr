@@ -9,7 +9,7 @@ MPI.init do |universe|
   if world.rank == root_rank
     future = root_proc.immediate_master_reduce(world.rank, MPI::Operation::SUM)
     sum, _ = future.get
-    assert sum == count * (count - 1) / 2
+    assert sum == count * (count - 1) // 2
   else
     root_proc.immediate_reduce(world.rank, MPI::Operation::SUM).wait
   end

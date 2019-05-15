@@ -9,7 +9,7 @@ MPI.init do |universe|
   rank = world.rank
 
   x, _ = world.immediate_scan(rank, MPI::Operation::SUM).get
-  assert x == (rank * (rank + 1)) / 2
+  assert x == (rank * (rank + 1)) // 2
 
   y = rank + 1
   z, _ = world.immediate_exclusive_scan(y, MPI::Operation::PROD).get

@@ -11,7 +11,7 @@ MPI.init do |universe|
   if rank == master_rank
     sum = master_proc.master_reduce(rank, 0, MPI::Operation.sum)
     puts "rank sum: #{sum}"
-    assert sum == size * (size - 1) / 2
+    assert sum == size * (size - 1) // 2
   else
     master_proc.reduce(rank, MPI::Operation.sum)
   end
