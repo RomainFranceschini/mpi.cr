@@ -6,7 +6,7 @@ MPI.init do |universe|
   x = Math::PI
   y = 0.0
 
-  sreq = world.this_process.immediate_send(x)
+  sreq = world.this_process.immediate_send(pointerof(x), 1)
   rreq = world.any_process.immediate_receive(pointerof(y), 1)
   rreq.wait
   loop do
@@ -25,9 +25,9 @@ MPI.init do |universe|
   assert world.any_process.immediate_matched_probe == nil
 
   y = 0.0
-  sreq = world.this_process.immediate_synchronous_send(x)
+  sreq = world.this_process.immediate_synchronous_send(pointerof(x), 1)
   if preq = world.any_process.immediate_matched_probe
-    msg, status = preq
+    msg, _ = preq
     rreq = msg.immediate_matched_receive(pointerof(y), 1)
     sreq.wait
     rreq.wait
