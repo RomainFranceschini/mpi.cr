@@ -16,7 +16,6 @@ matrix:
     - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=4.0.1
     - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=3.1.4
     - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=3.0.4
-    - env: MPI_LIBRARY=openmpi MPI_LIBRARY_VERSION=2.1.6
 
 install:
   - sh ci/install-mpi.sh
