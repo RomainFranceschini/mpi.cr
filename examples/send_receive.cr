@@ -1,4 +1,4 @@
-require "../spec/spec_helper"
+require "../spec/examples_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -21,12 +21,12 @@ MPI.init do |universe|
   if rank > 0
     world.process_at(0).send([rank, rank + 1, rank - 1])
   else
-    (size-1).times do
+    (size - 1).times do
       ary, status = world.any_process.receive_array(Int32)
       puts "Process #{rank} got message '#{ary}'. Status is: #{status}"
 
       x = status.source_rank
-      ary2 = [x, x+1, x-1]
+      ary2 = [x, x + 1, x - 1]
 
       assert ary == ary2
     end

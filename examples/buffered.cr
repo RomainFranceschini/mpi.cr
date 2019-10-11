@@ -1,4 +1,4 @@
-require "../spec/spec_helper"
+require "../spec/examples_helper"
 
 BUF_SIZE = 10 * 1024 * 1024
 

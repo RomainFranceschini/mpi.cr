@@ -1,4 +1,4 @@
-require "../spec/spec_helper"
+require "../spec/examples_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -12,6 +12,8 @@ MPI.init do |universe|
     future = root_proc.immediate_master_gather(i, count)
     slice, _ = future.get
     puts "Root gathered sequence: #{slice}."
+
+    # puts slice.each_with_index(1).all? { |i| i[0] == 2**i[1] }
 
     assert slice.each_with_index(1).all? { |val, i|
       val == 2 ** i

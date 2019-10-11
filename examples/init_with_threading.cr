@@ -1,4 +1,4 @@
-require "../spec/spec_helper"
+require "../spec/examples_helper"
 
 MPI.init(MPI::Threading::Multiple) do |universe|
   assert MPI::Threading::Multiple == MPI.threading_support

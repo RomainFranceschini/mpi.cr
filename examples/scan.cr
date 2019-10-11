@@ -1,5 +1,5 @@
 # TODO
-require "../spec/spec_helper"
+require "../spec/examples_helper"
 
 def fac(n)
   (1..n).reduce(1) { |acc, x| acc * x }

@@ -1,4 +1,4 @@
-require "../spec/spec_helper"
+require "../spec/examples_helper"
 
 REQUESTS_PER_SENDER = 10
 

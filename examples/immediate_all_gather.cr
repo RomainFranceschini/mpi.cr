@@ -1,4 +1,4 @@
-require "../spec/spec_helper"
+require "../spec/examples_helper"
 
 # TODO check why status count returns 0 with collective operations
 

@@ -1,4 +1,4 @@
-require "../spec/spec_helper"
+require "../spec/examples_helper"
 
 MPI.init do |universe|
   world = universe.world
@@ -8,8 +8,8 @@ MPI.init do |universe|
   even_group = world.group - odd_group
 
   assert(
-   (world.rank % 2 == 0 && even_group.rank != nil && odd_group.rank == nil) ||
-   (even_group.rank == nil && odd_group.rank != nil)
+    (world.rank % 2 == 0 && even_group.rank != nil && odd_group.rank == nil) ||
+    (even_group.rank == nil && odd_group.rank != nil)
   )
 
   my_group = odd_group.rank != nil ? odd_group : even_group
