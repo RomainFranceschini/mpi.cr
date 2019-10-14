@@ -32,7 +32,7 @@ jobs:
         apt update
         export MPI_LIBRARY="${{ matrix.vendor }}"
         export MPI_LIBRARY_VERSION="${{ matrix.version }}"
-        apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran wet
+        apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran wget
         sh ci/install-mpi.sh
         export MPI_PREFIX="${HOME}/opt/${{ matrix.vendor }}-${{ matrix.version }}"
         export PATH="${HOME}/.local/bin:${MPI_PREFIX}/bin${PATH:+":${PATH}"}"
