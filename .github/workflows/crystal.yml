@@ -31,7 +31,7 @@ jobs:
       run: |
         apt update
         export MPI_LIBRARY="${{ matrix.vendor }}"
-        export MPI_VERSION="${{ matrix.version }}"
+        export MPI_LIBRARY_VERSION="${{ matrix.version }}"
         apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran
         sh ci/install-mpi.sh
         export MPI_PREFIX="${HOME}/opt/${{ matrix.vendor }}-${{ matrix.version }}"
