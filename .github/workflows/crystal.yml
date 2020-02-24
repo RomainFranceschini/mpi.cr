@@ -35,18 +35,25 @@ jobs:
           key: ${{ matrix.vendor }}-${{ matrix.version }}
 
       - name: Install dependencies
-        if: steps.cache-dep.outputs.cache-hit != 'true'
+        env:
+          CACHE_HIT: ${{ steps.cache-dep.outputs.cache-hit }}
         run: |
-          apt update
-          export MPI_PREFIX="${GITHUB_WORKSPACE}/${{ matrix.vendor }}-${{ matrix.version }}"
-          export MPI_LIBRARY="${{ matrix.vendor }}"
-          export MPI_LIBRARY_VERSION="${{ matrix.version }}"
-          apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran wget
-          sh ci/install-mpi.sh
-
+          if [ ${CACHE_HIT} == "true" ]
+          then
+            echo "MPI library already installed: ${PACKAGE_NAME}"
+            cp -r ${GITHUB_WORKSPACE}/${{ matrix.vendor }}-${{ matrix.version }} "${HOME}/opt/${{ matrix.vendor }}-${{ matrix.version }}"
+            exit 0
+          else
+            apt update
+            export MPI_LIBRARY="${{ matrix.vendor }}"
+            export MPI_LIBRARY_VERSION="${{ matrix.version }}"
+            apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran wget
+            sh ci/install-mpi.sh
+            cp -r "${HOME}/opt/${{ matrix.vendor }}-${{ matrix.version }}" ${GITHUB_WORKSPACE}/${{ matrix.vendor }}-${{ matrix.version }}
+          fi
       - name: Run tests
         run: |
-          export MPI_PREFIX="${GITHUB_WORKSPACE}/${{ matrix.vendor }}-${{ matrix.version }}"
+          export MPI_PREFIX="${HOME}/opt/${{ matrix.vendor }}-${{ matrix.version }}"
           export PATH="${MPI_PREFIX}/bin:${PATH}"
           export LD_LIBRARY_PATH="${MPI_PREFIX}/lib:${LD_LIBRARY_PATH}"
           export LIBRARY_PATH="${MPI_PREFIX}/lib:${LIBRARY_PATH}"
