@@ -48,9 +48,9 @@ jobs:
       - name: Run tests
         env:
           MPI_INSTALL_PATH: ${GITHUB_WORKSPACE}/mpi
-          PATH: ${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/bin:${PATH}
-          LD_LIBRARY_PATH: ${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/lib
-          LIBRARY_PATH: ${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/lib
+          PATH: "${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/bin:${PATH}"
+          LD_LIBRARY_PATH: "${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/lib:${LD_LIBRARY_PATH}"
+          LIBRARY_PATH: "${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/lib:${LIBRARY_PATH}"
         run: |
           make
           make spec no-debug=1

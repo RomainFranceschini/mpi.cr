@@ -39,6 +39,6 @@ tar -xzf "${TARBALL_NAME}"
 
 cd "${PACKAGE_NAME}"
 mkdir -p "${INSTALL_PREFIX}"
-./configure --enable-shared --prefix="${INSTALL_PREFIX}" > /dev/null
+./configure --datarootdir=$PWD --enable-shared --prefix="${INSTALL_PREFIX}" > /dev/null
 make -j > /dev/null
 make install > /dev/null
