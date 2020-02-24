@@ -42,7 +42,7 @@ jobs:
           export MPI_LIBRARY="${{ matrix.vendor }}"
           export MPI_LIBRARY_VERSION="${{ matrix.version }}"
           apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran wget
-          ./ci/install-mpi.sh
+          sh ci/install-mpi.sh
 
       - name: Run tests
         run: |
