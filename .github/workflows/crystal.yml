@@ -46,7 +46,7 @@ jobs:
       - name: Build and run tests
         run: |
           export MPI_PREFIX="${GITHUB_WORKSPACE}/${{ matrix.vendor }}-${{ matrix.version }}"
-          export PATH="${HOME}/.local/bin:${MPI_PREFIX}/bin${PATH:+":${PATH}"}"
+          export PATH="${MPI_PREFIX}/bin:${PATH}"
           export LD_LIBRARY_PATH=${MPI_PREFIX}/lib:${LD_LIBRARY_PATH}
           export LIBRARY_PATH=${MPI_PREFIX}/lib:${LIBRARY_PATH}
           make
