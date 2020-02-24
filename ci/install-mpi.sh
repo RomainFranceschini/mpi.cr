@@ -2,8 +2,8 @@
 
 set -e
 
-DOWNLOAD_DIR="~/tmp"
-INSTALL_PREFIX="~"
+DOWNLOAD_DIR="${HOME}/tmp"
+INSTALL_PREFIX=$MPI_PREFIX
 
 PACKAGE_NAME="${MPI_LIBRARY:?"MPI_LIBRARY not set!"}-${MPI_LIBRARY_VERSION:?"MPI_LIBRARY_VERSION not set!"}"
 INSTALL_PREFIX="${INSTALL_PREFIX}/${PACKAGE_NAME}"
@@ -39,6 +39,6 @@ tar -xzf "${TARBALL_NAME}"
 
 cd "${PACKAGE_NAME}"
 mkdir -p "${INSTALL_PREFIX}"
-./configure --datarootdir=$PWD --enable-shared --prefix="${INSTALL_PREFIX}" > /dev/null
+./configure --enable-shared --prefix="${INSTALL_PREFIX}" > /dev/null
 make -j > /dev/null
 make install > /dev/null
