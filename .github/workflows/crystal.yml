@@ -31,7 +31,7 @@ jobs:
       - uses: actions/cache@v1
         id: cache-dep
         with:
-          path: ${GITHUB_WORKSPACE}/${{ matrix.vendor }}-${{ matrix.version }}
+          path: ${{ matrix.vendor }}-${{ matrix.version }}
           key: ${{ matrix.vendor }}-${{ matrix.version }}
 
       - name: Install dependencies
@@ -39,7 +39,6 @@ jobs:
         env:
           MPI_LIBRARY: ${{ matrix.vendor }}
           MPI_LIBRARY_VERSION: ${{ matrix.version }}
-          MPI_INSTALL_PATH: ${GITHUB_WORKSPACE}/mpi
         run: |
           apt update
           apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran wget
@@ -47,10 +46,9 @@ jobs:
 
       - name: Run tests
         env:
-          MPI_INSTALL_PATH: ${GITHUB_WORKSPACE}/mpi
-          PATH: "${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/bin:${PATH}"
-          LD_LIBRARY_PATH: "${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/lib:${LD_LIBRARY_PATH}"
-          LIBRARY_PATH: "${MPI_INSTALL_PATH}/${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/lib:${LIBRARY_PATH}"
+          PATH: "${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/bin:${PATH}"
+          LD_LIBRARY_PATH: "${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/lib:${LD_LIBRARY_PATH}"
+          LIBRARY_PATH: "${MPI_LIBRARY}-${MPI_LIBRARY_VERSION}/lib:${LIBRARY_PATH}"
         run: |
           make
           make spec no-debug=1
