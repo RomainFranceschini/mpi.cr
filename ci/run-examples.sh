@@ -4,6 +4,8 @@ set -e
 
 # enable oversubscribing when using newer Open MPI
 export OMPI_MCA_rmaps_base_oversubscribe=1
+export OMPI_ALLOW_RUN_AS_ROOT=1
+export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
 EXAMPLES_DIR="examples"
 BINARIES_DIR="build"

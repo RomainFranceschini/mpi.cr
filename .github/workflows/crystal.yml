@@ -31,7 +31,7 @@ jobs:
       - uses: actions/cache@v1
         id: cache-dep
         with:
-          path: ${HOME}/opt/${{ matrix.vendor }}-${{ matrix.version }}
+          path: ${GITHUB_WORKSPACE}/${{ matrix.vendor }}-${{ matrix.version }}
           key: ${{ matrix.vendor }}-${{ matrix.version }}
 
       - name: Install dependencies
@@ -45,7 +45,7 @@ jobs:
 
       - name: Build and run tests
         run: |
-          export MPI_PREFIX="${HOME}/opt/${{ matrix.vendor }}-${{ matrix.version }}"
+          export MPI_PREFIX="${GITHUB_WORKSPACE}/${{ matrix.vendor }}-${{ matrix.version }}"
           export PATH="${HOME}/.local/bin:${MPI_PREFIX}/bin${PATH:+":${PATH}"}"
           export LD_LIBRARY_PATH=${MPI_PREFIX}/lib:${LD_LIBRARY_PATH}
           export LIBRARY_PATH=${MPI_PREFIX}/lib:${LIBRARY_PATH}

@@ -1,6 +1,6 @@
 # mpi.cr - MPI bindings for Crystal (WIP)
 
-[![Build Status](https://travis-ci.org/RomainFranceschini/mpi.cr.svg?branch=master)](https://travis-ci.org/RomainFranceschini/mpi.cr)
+![mpi.cr CI](https://github.com/RomainFranceschini/mpi.cr/workflows/mpi.cr%20CI/badge.svg?branch=master)
 
 The [Message Passing Interface](http://www.mpi-forum.org) (MPI) is a specification for a
 message-passing style concurrency library. Implementations of MPI are often used to structure parallel computation on High Performance Computing systems. The MPI specification describes bindings for the C programming language (and through it C++) as well as for the Fortran programming language. 
