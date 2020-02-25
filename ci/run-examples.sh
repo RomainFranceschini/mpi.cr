@@ -16,6 +16,13 @@ then
   exit 1
 fi
 
+if [ $(./src/ext/mpi_vendor) == "openmpi" ]
+then
+  FLAGS="--allow-run-as-root"
+else
+  FLAGS=""
+fi
+
 binaries=$(ls ${EXAMPLES_DIR} | sed "s/\\.cr\$//")
 num_binaries=$(printf "%d" "$(echo "${binaries}" | wc -w)")
 
@@ -30,7 +37,7 @@ do
   num_proc=$((($(printf "%d" 0x$(openssl rand -hex 1)) % 7) + 2))
   printf "example ${binary} on ${num_proc} processes ... "
   output_file=${binary}_output
-  if (mpiexec -n ${num_proc} "${BINARIES_DIR}/${binary}" > "${output_file}")
+  if (mpiexec ${FLAGS} -n ${num_proc} "${BINARIES_DIR}/${binary}" > "${output_file}")
   then
     printf "ok\n"
     num_ok=$((${num_ok} + 1))
