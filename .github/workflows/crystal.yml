@@ -23,6 +23,7 @@ jobs:
           key: ${{ matrix.vendor }}
 
       - name: Install dependencies
+        shell: bash
         if: steps.cache-dep.outputs.cache-hit != 'true'
         run: |
           apt update
