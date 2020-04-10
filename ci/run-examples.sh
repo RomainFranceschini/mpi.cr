@@ -16,7 +16,7 @@ then
   exit 1
 fi
 
-if [ $(./src/ext/mpi_vendor) == "openmpi" ]
+if [ $(./src/ext/mpi_vendor) = openmpi ]
 then
   FLAGS="--allow-run-as-root"
 else
@@ -35,7 +35,7 @@ result="ok"
 for binary in ${binaries}
 do
   num_proc=$((($(printf "%d" 0x$(openssl rand -hex 1)) % 7) + 2))
-  printf "example ${binary} on ${num_proc} processes ... "
+  printf "example ${binary} on ${num_proc} processes ... (${FLAGS})"
   output_file=${binary}_output
   if (mpiexec ${FLAGS} -n ${num_proc} "${BINARIES_DIR}/${binary}" > "${output_file}")
   then
