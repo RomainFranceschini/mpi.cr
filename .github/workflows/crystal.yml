@@ -25,18 +25,20 @@ jobs:
       - name: Install dependencies
         if: steps.cache-dep.outputs.cache-hit != 'true'
         run: |
-          sudo apt update
+          apt update
           declare -a mpi_vendor_array=($(echo "${{ matrix.vendor }}" | tr "-" "\n"))
           export MPI_LIBRARY="${mpi_vendor_array[0]}"
           export MPI_LIBRARY_VERSION="${mpi_vendor_array[1]}"
-          sudo apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran wget
+          apt-get -yq --no-install-suggests --no-install-recommends install build-essential gfortran wget
           sh ci/install-mpi.sh
           cp -r "${HOME}/opt/${{ matrix.vendor }}" ${GITHUB_WORKSPACE}/${{ matrix.vendor }}
+
       - name: Reuse dependencies
         if: steps.cache-dep.outputs.cache-hit == 'true'
         run: |
           echo "MPI library already installed: ${PACKAGE_NAME}"
           cp -r ${GITHUB_WORKSPACE}/${{ matrix.vendor }} "${HOME}/opt/${{ matrix.vendor }}"
+
       - name: Run tests
         run: |
           export MPI_PREFIX="${HOME}/opt/${{ matrix.vendor }}"
